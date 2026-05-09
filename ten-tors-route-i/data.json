@@ -1,0 +1,60 @@
+{
+  "sourceUrl": "https://www.tentors.org.uk/eventdata/routei.html",
+  "generatedAt": "2025-05-11T19:02:00.000Z",
+  "sourceLastUpdated": "19:02",
+  "team": {
+    "requestedName": "Polar Explorer Scouts",
+    "sourceName": "Polar Explorer Scouts",
+    "code": "IF",
+    "nameMatchesRequest": true
+  },
+  "route": "I",
+  "routeProgressPercent": 65,
+  "reachedCount": 12,
+  "currentCheckpoint": {
+    "name": "WHITE BARROW",
+    "arrivalTime": "17:57",
+    "reached": true,
+    "elapsed": {
+      "minutes": 657,
+      "label": "10h 57m"
+    },
+    "progressPercent": 65,
+    "coordinates": {
+      "lat": 50.5757,
+      "lon": -4.0459
+    }
+  },
+  "nextCheckpoint": {
+    "name": "STANDON FARM",
+    "arrivalTime": null,
+    "reached": false,
+    "elapsed": null,
+    "progressPercent": 71,
+    "coordinates": {
+      "lat": 50.6167,
+      "lon": -4.0525
+    }
+  },
+  "checkpoints": [
+    {"name":"START","arrivalTime":"07:00","reached":true,"elapsed":{"minutes":0,"label":"0m"},"progressPercent":0,"coordinates":{"lat":50.7379,"lon":-4.0068}},
+    {"name":"HIGHER TOR","arrivalTime":"08:00","reached":true,"elapsed":{"minutes":60,"label":"1h 00m"},"progressPercent":6,"coordinates":{"lat":50.7167,"lon":-4.0032}},
+    {"name":"COSDON HILL","arrivalTime":"08:25","reached":true,"elapsed":{"minutes":85,"label":"1h 25m"},"progressPercent":12,"coordinates":{"lat":50.6928,"lon":-3.9414}},
+    {"name":"SHILSTONE TOR","arrivalTime":"09:02","reached":true,"elapsed":{"minutes":122,"label":"2h 02m"},"progressPercent":18,"coordinates":{"lat":50.6705,"lon":-3.9126}},
+    {"name":"STEEPERTON TOR","arrivalTime":"10:40","reached":true,"elapsed":{"minutes":220,"label":"3h 40m"},"progressPercent":24,"coordinates":{"lat":50.6729,"lon":-3.9744}},
+    {"name":"WATERN TOR","arrivalTime":"11:40","reached":true,"elapsed":{"minutes":280,"label":"4h 40m"},"progressPercent":29,"coordinates":{"lat":50.6657,"lon":-3.9647}},
+    {"name":"SITTAFORD TOR","arrivalTime":"12:47","reached":true,"elapsed":{"minutes":347,"label":"5h 47m"},"progressPercent":35,"coordinates":{"lat":50.6597,"lon":-3.9308}},
+    {"name":"STANNON TOR","arrivalTime":"13:33","reached":true,"elapsed":{"minutes":393,"label":"6h 33m"},"progressPercent":41,"coordinates":{"lat":50.6467,"lon":-3.9348}},
+    {"name":"POSTBRIDGE","arrivalTime":"14:32","reached":true,"elapsed":{"minutes":452,"label":"7h 32m"},"progressPercent":47,"coordinates":{"lat":50.5958,"lon":-3.9185}},
+    {"name":"HIGHER WHITE TOR","arrivalTime":"15:50","reached":true,"elapsed":{"minutes":530,"label":"8h 50m"},"progressPercent":53,"coordinates":{"lat":50.5891,"lon":-3.9794}},
+    {"name":"HOLMING BEAM","arrivalTime":"16:58","reached":true,"elapsed":{"minutes":598,"label":"9h 58m"},"progressPercent":59,"coordinates":{"lat":50.5723,"lon":-4.0115}},
+    {"name":"WHITE BARROW","arrivalTime":"17:57","reached":true,"elapsed":{"minutes":657,"label":"10h 57m"},"progressPercent":65,"coordinates":{"lat":50.5757,"lon":-4.0459}},
+    {"name":"STANDON FARM","arrivalTime":null,"reached":false,"elapsed":null,"progressPercent":71,"coordinates":{"lat":50.6167,"lon":-4.0525}},
+    {"name":"WILLSWORTHY","arrivalTime":null,"reached":false,"elapsed":null,"progressPercent":76,"coordinates":{"lat":50.6281,"lon":-4.0712}},
+    {"name":"HARE TOR","arrivalTime":null,"reached":false,"elapsed":null,"progressPercent":82,"coordinates":{"lat":50.6269,"lon":-4.0318}},
+    {"name":"KITTY TOR","arrivalTime":null,"reached":false,"elapsed":null,"progressPercent":88,"coordinates":{"lat":50.6574,"lon":-4.0221}},
+    {"name":"EAST MILL TOR","arrivalTime":null,"reached":false,"elapsed":null,"progressPercent":94,"coordinates":{"lat":50.6903,"lon":-4.0105}},
+    {"name":"FINISH","arrivalTime":null,"reached":false,"elapsed":null,"progressPercent":100,"coordinates":{"lat":50.7379,"lon":-4.0068}}
+  ],
+  "rawTeamRow": "Polar Explorer Scouts IF 07:00 08:00 08:25 09:02 10:40 11:40 12:47 13:33 14:32 15:50 16:58 17:57"
+}
