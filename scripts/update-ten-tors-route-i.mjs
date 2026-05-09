@@ -5,6 +5,7 @@ const SOURCE_URL = 'https://www.tentors.org.uk/eventdata/routei.html';
 const TEAM_CODE = 'IF';
 const TEAM_NAME = 'Polar Explorer Scouts';
 const OUTPUT = process.env.OUTPUT || 'ten-tors-route-i/data.json';
+const FALLBACK_IMAGE_URL = 'https://commons.wikimedia.org/wiki/Special:FilePath/Dartmoor%20view%20from%20Haytor.jpg?width=900';
 
 const ROUTE = [
   'START', 'HIGHER TOR', 'COSDON HILL', 'SHILSTONE TOR', 'STEEPERTON TOR',
@@ -59,6 +60,60 @@ function cleanText(html) {
     .replace(/&amp;/g, '&');
 }
 
+async function resolveCheckpointImage(checkpoint) {
+  const { lat, lon } = checkpoint.coordinates;
+  const params = new URLSearchParams({
+    action: 'query',
+    generator: 'geosearch',
+    ggscoord: `${lat}|${lon}`,
+    ggsradius: '6000',
+    ggslimit: '8',
+    prop: 'pageimages|info',
+    pithumbsize: '900',
+    inprop: 'url',
+    format: 'json',
+    origin: '*',
+  });
+
+  try {
+    const response = await fetch(`https://commons.wikimedia.org/w/api.php?${params}`, {
+      headers: { 'user-agent': 'github-actions-ten-tors-dashboard/1.0' },
+    });
+    if (!response.ok) throw new Error(`Wikimedia HTTP ${response.status}`);
+    const json = await response.json();
+    const pages = Object.values(json?.query?.pages || {});
+    const page = pages.find((candidate) => candidate?.thumbnail?.source);
+    return {
+      imageUrl: page?.thumbnail?.source || FALLBACK_IMAGE_URL,
+      imageSource: page?.fullurl || 'fallback',
+      imageTitle: page?.title || 'Dartmoor landscape fallback',
+    };
+  } catch (error) {
+    return {
+      imageUrl: FALLBACK_IMAGE_URL,
+      imageSource: 'fallback',
+      imageTitle: 'Dartmoor landscape fallback',
+      imageError: error.message,
+    };
+  }
+}
+
+async function addImages(data) {
+  const enriched = await Promise.all(
+    data.checkpoints.map(async (checkpoint) => ({
+      ...checkpoint,
+      ...(await resolveCheckpointImage(checkpoint)),
+    })),
+  );
+  const byName = new Map(enriched.map((checkpoint) => [checkpoint.name, checkpoint]));
+  return {
+    ...data,
+    checkpoints: enriched,
+    currentCheckpoint: byName.get(data.currentCheckpoint.name) || data.currentCheckpoint,
+    nextCheckpoint: data.nextCheckpoint ? byName.get(data.nextCheckpoint.name) || data.nextCheckpoint : null,
+  };
+}
+
 function parse(html) {
   const lines = cleanText(html)
     .split(/\n+/)
@@ -96,6 +151,11 @@ function parse(html) {
     sourceUrl: SOURCE_URL,
     generatedAt: new Date().toISOString(),
     sourceLastUpdated,
+    imageResolution: {
+      provider: 'Wikimedia Commons geosearch',
+      radiusMetres: 6000,
+      fallbackImageUrl: FALLBACK_IMAGE_URL,
+    },
     team: {
       requestedName: TEAM_NAME,
       sourceName,
@@ -121,8 +181,9 @@ if (!response.ok) {
 }
 
 const html = await response.text();
-const data = parse(html);
+const data = await addImages(parse(html));
 await mkdir(path.dirname(OUTPUT), { recursive: true });
 await writeFile(OUTPUT, `${JSON.stringify(data, null, 2)}\n`, 'utf8');
 console.log(`Wrote ${OUTPUT}`);
 console.log(`${data.team.sourceName} ${data.team.code}: ${data.reachedCount}/${data.checkpoints.length} checkpoints`);
+console.log(`Resolved ${data.checkpoints.filter((checkpoint) => checkpoint.imageUrl).length} checkpoint image URLs`);
