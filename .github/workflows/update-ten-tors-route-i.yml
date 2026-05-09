@@ -1,0 +1,58 @@
+name: Update Ten Tors Route I data
+
+on:
+  workflow_dispatch:
+  repository_dispatch:
+    types:
+      - ten-tors-route-i-update
+  schedule:
+    # GitHub Actions schedule is not a real-time timer. Five minutes is a practical
+    # low-friction cadence; repository_dispatch can be used for webhook-triggered updates.
+    - cron: '*/5 * * * *'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ten-tors-route-i-data
+  cancel-in-progress: true
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: source
+
+      - name: Check out GitHub Pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: pages
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Fetch and parse Ten Tors data
+        working-directory: source
+        env:
+          OUTPUT: ../pages/ten-tors-route-i/data.json
+        run: node scripts/update-ten-tors-route-i.mjs
+
+      - name: Commit updated JSON to gh-pages
+        working-directory: pages
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ten-tors-route-i/data.json
+          if git diff --cached --quiet; then
+            echo "No Ten Tors data changes to commit."
+          else
+            git commit -m "Update Ten Tors Route I data"
+            git push
+          fi
