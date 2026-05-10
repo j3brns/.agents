@@ -1,0 +1,52 @@
+{
+  "sourceUrl": "https://www.tentors.org.uk/eventdata/routei.html",
+  "generatedAt": "2026-05-10T00:00:00.000Z",
+  "sourceLastUpdated": "unknown",
+  "team": {
+    "requestedName": "Polar Explorer Scouts",
+    "sourceName": "Polar Explorer Scouts",
+    "code": "IF",
+    "nameMatchesRequest": true
+  },
+  "route": "I",
+  "routeProgressPercent": 0,
+  "reachedCount": 0,
+  "currentCheckpoint": {
+    "name": "START",
+    "arrivalTime": null,
+    "reached": false,
+    "elapsed": null,
+    "progressPercent": 0,
+    "coordinates": { "lat": 50.7379, "lon": -4.0068 }
+  },
+  "nextCheckpoint": {
+    "name": "START",
+    "arrivalTime": null,
+    "reached": false,
+    "elapsed": null,
+    "progressPercent": 0,
+    "coordinates": { "lat": 50.7379, "lon": -4.0068 }
+  },
+  "checkpoints": [
+    {"name":"START","arrivalTime":null,"reached":false,"elapsed":null,"progressPercent":0,"coordinates":{"lat":50.7379,"lon":-4.0068},"localImageUrl":null,"imageUrl":null,"imageSource":null,"imageTitle":null},
+    {"name":"HIGHER TOR","arrivalTime":null,"reached":false,"elapsed":null,"progressPercent":6,"coordinates":{"lat":50.7167,"lon":-4.0032},"localImageUrl":null,"imageUrl":null,"imageSource":null,"imageTitle":null},
+    {"name":"COSDON HILL","arrivalTime":null,"reached":false,"elapsed":null,"progressPercent":12,"coordinates":{"lat":50.6928,"lon":-3.9414},"localImageUrl":null,"imageUrl":null,"imageSource":null,"imageTitle":null},
+    {"name":"SHILSTONE TOR","arrivalTime":null,"reached":false,"elapsed":null,"progressPercent":18,"coordinates":{"lat":50.6705,"lon":-3.9126},"localImageUrl":null,"imageUrl":null,"imageSource":null,"imageTitle":null},
+    {"name":"STEEPERTON TOR","arrivalTime":null,"reached":false,"elapsed":null,"progressPercent":24,"coordinates":{"lat":50.6729,"lon":-3.9744},"localImageUrl":null,"imageUrl":null,"imageSource":null,"imageTitle":null},
+    {"name":"WATERN TOR","arrivalTime":null,"reached":false,"elapsed":null,"progressPercent":29,"coordinates":{"lat":50.6657,"lon":-3.9647},"localImageUrl":null,"imageUrl":null,"imageSource":null,"imageTitle":null},
+    {"name":"SITTAFORD TOR","arrivalTime":null,"reached":false,"elapsed":null,"progressPercent":35,"coordinates":{"lat":50.6597,"lon":-3.9308},"localImageUrl":null,"imageUrl":null,"imageSource":null,"imageTitle":null},
+    {"name":"STANNON TOR","arrivalTime":null,"reached":false,"elapsed":null,"progressPercent":41,"coordinates":{"lat":50.6467,"lon":-3.9348},"localImageUrl":null,"imageUrl":null,"imageSource":null,"imageTitle":null},
+    {"name":"POSTBRIDGE","arrivalTime":null,"reached":false,"elapsed":null,"progressPercent":47,"coordinates":{"lat":50.5958,"lon":-3.9185},"localImageUrl":null,"imageUrl":null,"imageSource":null,"imageTitle":null},
+    {"name":"HIGHER WHITE TOR","arrivalTime":null,"reached":false,"elapsed":null,"progressPercent":53,"coordinates":{"lat":50.5891,"lon":-3.9794},"localImageUrl":null,"imageUrl":null,"imageSource":null,"imageTitle":null},
+    {"name":"HOLMING BEAM","arrivalTime":null,"reached":false,"elapsed":null,"progressPercent":59,"coordinates":{"lat":50.5723,"lon":-4.0115},"localImageUrl":null,"imageUrl":null,"imageSource":null,"imageTitle":null},
+    {"name":"WHITE BARROW","arrivalTime":null,"reached":false,"elapsed":null,"progressPercent":65,"coordinates":{"lat":50.5757,"lon":-4.0459},"localImageUrl":null,"imageUrl":null,"imageSource":null,"imageTitle":null},
+    {"name":"STANDON FARM","arrivalTime":null,"reached":false,"elapsed":null,"progressPercent":71,"coordinates":{"lat":50.6167,"lon":-4.0525},"localImageUrl":null,"imageUrl":null,"imageSource":null,"imageTitle":null},
+    {"name":"WILLSWORTHY","arrivalTime":null,"reached":false,"elapsed":null,"progressPercent":76,"coordinates":{"lat":50.6281,"lon":-4.0712},"localImageUrl":null,"imageUrl":null,"imageSource":null,"imageTitle":null},
+    {"name":"HARE TOR","arrivalTime":null,"reached":false,"elapsed":null,"progressPercent":82,"coordinates":{"lat":50.6269,"lon":-4.0318},"localImageUrl":null,"imageUrl":null,"imageSource":null,"imageTitle":null},
+    {"name":"KITTY TOR","arrivalTime":null,"reached":false,"elapsed":null,"progressPercent":88,"coordinates":{"lat":50.6574,"lon":-4.0221},"localImageUrl":null,"imageUrl":null,"imageSource":null,"imageTitle":null},
+    {"name":"EAST MILL TOR","arrivalTime":null,"reached":false,"elapsed":null,"progressPercent":94,"coordinates":{"lat":50.6903,"lon":-4.0105},"localImageUrl":null,"imageUrl":null,"imageSource":null,"imageTitle":null},
+    {"name":"FINISH","arrivalTime":null,"reached":false,"elapsed":null,"progressPercent":100,"coordinates":{"lat":50.7379,"lon":-4.0068},"localImageUrl":null,"imageUrl":null,"imageSource":null,"imageTitle":null}
+  ],
+  "rawTeamRow": "",
+  "imagePolicy": {"forceImageRefresh": false, "preserved": 0, "resolved": 0, "downloaded": 0, "fallbacks": 0}
+}
