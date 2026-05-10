@@ -2,14 +2,18 @@ name: Update Ten Tors Route I data
 
 on:
   workflow_dispatch:
+    inputs:
+      force_image_refresh:
+        description: 'Refresh cached checkpoint images'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
   repository_dispatch:
-    types:
-      - ten-tors-route-i-update
+    types: [ten-tors-route-i-update]
   schedule:
-    # Limited operating window for this weekend only.
-    # UK daylight window: 06:00-21:00 Europe/London.
-    # In May, BST is UTC+1, so this is 05:00-20:59 UTC.
-    # This schedule is deliberately date-bound to 9-10 May.
     - cron: '*/5 5-20 9,10 5 *'
 
 permissions:
@@ -20,8 +24,6 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  # Defensive gate: even repository_dispatch and manual runs will not update JSON
-  # outside this operational window unless this workflow is edited.
   UPDATE_WINDOW_START: '2026-05-09T06:00:00+01:00'
   UPDATE_WINDOW_END: '2026-05-10T21:00:00+01:00'
 
@@ -37,36 +39,26 @@ jobs:
           now_epoch=$(TZ=Europe/London date +%s)
           start_epoch=$(date -d "$UPDATE_WINDOW_START" +%s)
           end_epoch=$(date -d "$UPDATE_WINDOW_END" +%s)
-          now_local=$(TZ=Europe/London date --iso-8601=seconds)
-
-          echo "Local time: $now_local"
-          echo "Allowed window: $UPDATE_WINDOW_START to $UPDATE_WINDOW_END"
-
           if [ "$now_epoch" -ge "$start_epoch" ] && [ "$now_epoch" -le "$end_epoch" ]; then
             echo "allowed=true" >> "$GITHUB_OUTPUT"
-            echo "Inside update window."
           else
             echo "allowed=false" >> "$GITHUB_OUTPUT"
-            echo "Outside update window. Skipping data update."
           fi
 
-      - name: Check out source branch
+      - uses: actions/checkout@v4
         if: steps.window.outputs.allowed == 'true'
-        uses: actions/checkout@v4
         with:
           ref: main
           path: source
 
-      - name: Check out GitHub Pages branch
+      - uses: actions/checkout@v4
         if: steps.window.outputs.allowed == 'true'
-        uses: actions/checkout@v4
         with:
           ref: gh-pages
           path: pages
 
-      - name: Set up Node.js
+      - uses: actions/setup-node@v4
         if: steps.window.outputs.allowed == 'true'
-        uses: actions/setup-node@v4
         with:
           node-version: '20'
 
@@ -75,18 +67,23 @@ jobs:
         working-directory: source
         env:
           OUTPUT: ../pages/ten-tors-route-i/data.json
+          EXISTING_DATA: ../pages/ten-tors-route-i/data.json
+          IMAGE_OUTPUT_DIR: ../pages/ten-tors-route-i/images
+          IMAGE_PUBLIC_PATH: ./images
+          FORCE_IMAGE_REFRESH: ${{ github.event.inputs.force_image_refresh || 'false' }}
         run: node scripts/update-ten-tors-route-i.mjs
 
-      - name: Commit updated JSON to gh-pages
+      - name: Commit updated JSON/images to gh-pages
         if: steps.window.outputs.allowed == 'true'
         working-directory: pages
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add ten-tors-route-i/data.json
+          mkdir -p ten-tors-route-i/images
+          git add -A ten-tors-route-i/data.json ten-tors-route-i/images
           if git diff --cached --quiet; then
-            echo "No Ten Tors data changes to commit."
+            echo "No Ten Tors data/image changes to commit."
           else
-            git commit -m "Update Ten Tors Route I data"
-            git push
+            git commit -m "Update Ten Tors Route I dashboard data"
+            git push origin HEAD:gh-pages
           fi
