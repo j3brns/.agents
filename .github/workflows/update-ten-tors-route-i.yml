@@ -79,11 +79,10 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          mkdir -p ten-tors-route-i/images
-          git add -A ten-tors-route-i/data.json ten-tors-route-i/images
+          git add ten-tors-route-i/data.json ten-tors-route-i/images
           if git diff --cached --quiet; then
             echo "No Ten Tors data/image changes to commit."
           else
             git commit -m "Update Ten Tors Route I dashboard data"
-            git push origin HEAD:gh-pages
+            git push
           fi
