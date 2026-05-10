@@ -23,21 +23,6 @@ const elapsed = (a,b) => { const x=minutes(a), y=minutes(b); if (x==null||y==nul
 
 function cleanText(html){return html.replace(/<script[\s\S]*?<\/script>/gi,' ').replace(/<style[\s\S]*?<\/style>/gi,' ').replace(/<[^>]+>/g,'\n').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&');}
 
-async function fetchWithRetry(url, options = {}, attempts = 4) {
-  let lastError;
-  for (let i = 1; i <= attempts; i += 1) {
-    try {
-      const response = await fetch(url, options);
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      return response;
-    } catch (error) {
-      lastError = error;
-      if (i < attempts) await new Promise((r) => setTimeout(r, i * 1500));
-    }
-  }
-  throw lastError;
-}
-
 function parse(html){
   const lines=cleanText(html).split(/\n+/).map((x)=>x.replace(/\s+/g,' ').trim()).filter(Boolean);
   const sourceLastUpdated=(lines.find((l)=>/^LAST UPDATED:/i.test(l))||'LAST UPDATED: unknown').replace(/^LAST UPDATED:\s*/i,'');
@@ -56,7 +41,8 @@ async function readExisting(){ if(!existsSync(EXISTING_DATA)) return null; try{r
 async function resolveImage(checkpoint){
   const { lat, lon } = checkpoint.coordinates;
   const params = new URLSearchParams({ action:'query', generator:'geosearch', ggscoord:`${lat}|${lon}`, ggsradius:'6000', ggslimit:'8', prop:'pageimages|info', pithumbsize:'1600', inprop:'url', format:'json', origin:'*' });
-  const r=await fetchWithRetry(`https://commons.wikimedia.org/w/api.php?${params}`);
+  const r=await fetch(`https://commons.wikimedia.org/w/api.php?${params}`);
+  if(!r.ok) throw new Error(`Wikimedia HTTP ${r.status}`);
   const j=await r.json(); const pages=Object.values(j?.query?.pages||{}); const p=pages.find((x)=>x?.thumbnail?.source);
   if(!p?.thumbnail?.source) throw new Error('No thumbnail candidate');
   return { imageUrl:p.thumbnail.source, imageSource:p.fullurl||'wikimedia', imageTitle:p.title||checkpoint.name };
@@ -68,7 +54,7 @@ async function saveAsWebp(tmpIn, outFile){
 
 async function cacheImage(cp){
   const filename=`${slug(cp.name)}.webp`; const outPath=path.join(IMAGE_OUTPUT_DIR,filename); const publicPath=`${IMAGE_PUBLIC_PATH}/${filename}`;
-  const img=await resolveImage(cp); const res=await fetchWithRetry(img.imageUrl);
+  const img=await resolveImage(cp); const res=await fetch(img.imageUrl); if(!res.ok) throw new Error(`Image HTTP ${res.status}`);
   const buf=Buffer.from(await res.arrayBuffer());
   await mkdir(IMAGE_OUTPUT_DIR,{recursive:true});
   const tmpIn=path.join(IMAGE_OUTPUT_DIR,`${slug(cp.name)}.tmp`); await writeFile(tmpIn,buf);
@@ -78,17 +64,9 @@ async function cacheImage(cp){
   return { ...img, localImageUrl: publicPath };
 }
 
+const response=await fetch(SOURCE_URL,{headers:{'user-agent':'github-actions-ten-tors-dashboard/2.0'}}); if(!response.ok) throw new Error(`Fetch failed: ${response.status}`);
+const parsed=parse(await response.text());
 const existing=await readExisting();
-let parsed;
-try {
-  const response=await fetchWithRetry(SOURCE_URL,{headers:{'user-agent':'github-actions-ten-tors-dashboard/2.0'}});
-  parsed=parse(await response.text());
-} catch (error) {
-  if (!existing) throw error;
-  console.warn(`Source fetch failed, preserving existing data: ${error.message || error}`);
-  parsed = { ...existing, generatedAt: new Date().toISOString(), sourceError: String(error.message || error) };
-}
-
 const existingByName=new Map((existing?.checkpoints||[]).map((c)=>[c.name,c]));
 let preserved=0,resolved=0,downloaded=0,fallbacks=0;
 
