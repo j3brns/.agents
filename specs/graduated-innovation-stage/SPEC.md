@@ -1,6 +1,6 @@
 # The Graduated Innovation Stage ("Causeway")
 
-**Spec v0.1 — 2026-06-12 — status: draft for iteration**
+**Spec v0.2 — 2026-06-12 — status: iterated; open questions resolved (§14)**
 
 Extending **Innovation Sandbox on AWS (ISB)** into a first-class SDLC stage, so agentic
 workloads built under AI-DLC graduate from a prudently permissive sandbox to pre-prod
@@ -24,6 +24,10 @@ innovation and pre-prod.
 | D9 | Template composition | **Golden templates; agent skills adapt, never author net-new bootstraps** (§8) |
 | D10 | Evidence home | Delegated → **GitLab-native system of record, manifest-linked to AWS runtime evidence** (§9) |
 | D11 | Control scope | Platform team owns **GitLab instance admin** and the **Bedrock/AgentCore estate** end-to-end. It does **not** own AWS Organizations/SCPs or org networking — these are dependencies on the CCoE (§2.3) |
+| D12 | Stage ladder confirmed | **Four stages** (S0 Explore → S1 Incubate → S2 Harden → S3 Pre-prod) |
+| D13 | Harvest scope v1 | **Records only**: repo state, final artefact digest, eval baselines, experiment record. AgentCore Memory export deferred to v2 (E7 story, trigger: first "park & revive" demand) |
+| D14 | Evidence verifier form | **Versioned catalog component + small CLI** run in the promotion pipeline; verdict recorded as a signed pipeline artifact. No standing service in v1 |
+| D15 | Repo timing | **Repo created at lease approval** from the stage template — every experiment is born with its outer loop attached |
 
 ---
 
@@ -155,14 +159,18 @@ which ISB structures for customisation and which the CCoE owns anyway).
    REST API (`/leases`, `/leaseTemplates`, `/blueprints`); calls the GitLab API.
 2. **Event bridge to GitLab** — EventBridge → API Destination → GitLab pipeline-trigger
    tokens. ISB has no webhooks; this is the missing nervous system. Key routes:
-   - `LeaseApproved` → create repo from stage template, run S0 bootstrap pipeline
+   - `LeaseApproved` → **create repo from the stage template immediately** (D15) and run
+     the S0 bootstrap pipeline — every experiment is born with its outer loop attached
    - lease `durationThreshold` alerts → open "decide: graduate/extend/harvest" issue
    - `CleanAccountRequest` (pre-cleanup) → **harvest pipeline** (§4.4), which must
      complete (or time out) before cleanup proceeds
    - `AccountDriftDetected`, `AccountCleanupFailed` → platform alerts
 3. **GitLab CI/CD Catalog namespace `causeway/`** — the standardised outer loop (§6.4).
-4. **Evidence verifier** — a pipeline component + small verification CLI that checks the
-   evidence ledger at promotion time (signatures, digests, threshold results, lineage).
+4. **Evidence verifier** (D14) — a versioned catalog component + small verification CLI
+   run inside the promotion pipeline; checks the evidence ledger (signatures, digests,
+   threshold results, lineage) and records its verdict as a signed pipeline artifact.
+   Deliberately not a standing service in v1 — nothing to operate, patch, or secure;
+   extract to a service only if external auditors require an API.
 5. **Stage bootstraps as ISB blueprints** — Service Catalog products rendered to
    CloudFormation StackSets and registered via `/blueprints`, so ISB itself deploys the
    stage baseline at lease provisioning (OIDC trust role for GitLab runners, OTel/ADOT
@@ -190,8 +198,8 @@ On lease end without graduation, the harvest pipeline runs **before** cleanup:
 1. Freeze the lease via API (stops spend during harvest).
 2. Verify repo == account: IaC plan against live account; drift is *recorded*, not fixed.
 3. Push final OCI image / code bundle to the GitLab registry (digest recorded).
-4. Export eval baselines, `traces` excerpts, and AgentCore **Memory** store contents we
-   own via the Memory APIs.
+4. Export eval baselines and `traces` excerpts. (AgentCore **Memory** store export is
+   deferred to v2 per D13 — v2 trigger is the first park-and-revive demand.)
 5. Write the **experiment record** (AI-DLC inception/elaboration artefacts + outcome +
    decision: park / kill / revive) to the BU's catalog area.
 6. Signal the orchestrator → cleanup proceeds → account recycles. Nothing of value dies
@@ -399,7 +407,7 @@ are inlined.
 | E4 | **Evidence & attestation** | manifest schema + verifier CLI; cosign+KMS signing; SLSA-L1 provenance wiring; release-evidence conventions; runtime-evidence reference resolver | The attest-to-promote mechanism |
 | E5 | **Agent artefact templates** | strands-py / strands-ts / langgraph scaffolds with `agentcore/` config, evaluators, AI-DLC steering rules, cassette layout; lineage stamping in scaffolder skill | Composition propagation, agent plane |
 | E6 | **Model governance** | Bedrock allowlist/deny-list config as code; pin-on-baseline pipeline rule; Cedar policy suites + tests for Gateway; guardrail config in manifest | Cheap (estate we own), high audit value |
-| E7 | **Harvest** | pre-cleanup hook with completion signal; memory export; experiment-record generator; park/revive flow (re-vend lease from harvested state) | Stops knowledge loss; enables "revive" which sells the platform to BUs |
+| E7 | **Harvest** | pre-cleanup hook with completion signal; experiment-record generator; park/revive flow (re-vend lease from harvested state); *v2:* Memory-store export (D13) | Stops knowledge loss; enables "revive" which sells the platform to BUs |
 | E8 | **Tenancy v2** | per-BU model quotas/allowlists; deferred AWS-pool partition (trigger-gated, §10) | Per §10 table |
 | E9 | **Catalog contribution path** | pattern-induction MR flow, policy-pack gate, semver release automation | Prevents golden-template rot; closes the loop |
 
@@ -434,10 +442,18 @@ template, and component semver-released with a deprecation policy.
 
 ---
 
-## 14. Open questions for iteration (v0.1 → v0.2)
+## 14. Iteration record
 
-1. Naming and the S2 "Harden" framing — keep four stages?
-2. Harvest scope: is Memory-store export in v1, or experiment-record only?
-3. Should S0 repos be mandatory at lease creation, or lazily on first push?
-4. Evidence verifier: standalone service vs pure pipeline component?
-5. Who arbitrates the catalog contribution path (E9) — platform team only, or BU maintainers?
+**Resolved in v0.2** (stakeholder interview, 2026-06-12):
+
+1. Stage ladder — **four stages confirmed** (D12).
+2. Harvest scope — **records only in v1**; Memory export is a v2 story under E7 (D13).
+3. Repo timing — **created at lease approval**, outer loop attached from birth (D15).
+4. Evidence verifier — **catalog component + CLI**, no standing service (D14).
+
+**Remaining for v0.3:**
+
+1. Who arbitrates the catalog contribution path (E9) — platform team only, or trusted BU
+   maintainers with platform review? (Default until decided: platform team only.)
+2. Working-title naming ("Causeway", stage names) — cosmetic, decide before first
+   external comms.
