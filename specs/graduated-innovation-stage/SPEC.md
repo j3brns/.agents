@@ -1,6 +1,6 @@
 # The Graduated Innovation Stage ("Causeway")
 
-**Spec v0.2 — 2026-06-12 — status: iterated; open questions resolved (§14)**
+**Spec v0.3 — 2026-06-12 — status: iterated; simplicity contract applied (§2.4, §15)**
 
 Extending **Innovation Sandbox on AWS (ISB)** into a first-class SDLC stage, so agentic
 workloads built under AI-DLC graduate from a prudently permissive sandbox to pre-prod
@@ -28,6 +28,9 @@ innovation and pre-prod.
 | D13 | Harvest scope v1 | **Records only**: repo state, final artefact digest, eval baselines, experiment record. AgentCore Memory export deferred to v2 (E7 story, trigger: first "park & revive" demand) |
 | D14 | Evidence verifier form | **Versioned catalog component + small CLI** run in the promotion pipeline; verdict recorded as a signed pipeline artifact. No standing service in v1 |
 | D15 | Repo timing | **Repo created at lease approval** from the stage template — every experiment is born with its outer loop attached |
+| D16 | Developer surface | **One file, three interactions** (§2.4): developers edit only `causeway.yml`; start / push / promote-by-MR. ISB UI, manifests, CI config and lease mechanics are never developer-facing |
+| D17 | Operator surface | **Two operated things** (§4.1): a trigger-driven **control project** (orchestrator-as-pipelines, no service, no database) and a **catalog monorepo** on a single release train (`release: N`) |
+| D18 | Simplicity floor | "No simpler" list (§15): stages, verifier, digest pinning, lineage, harvest-before-nuke, pinned-model evals, and the CCoE boundary are irreducible and may not be optimised away |
 
 ---
 
@@ -122,6 +125,64 @@ Therefore:
 
 ---
 
+### 2.4 The simplicity contract (D16/D17)
+
+Both surfaces are governed by a hard rule: **a person interacts with the platform through
+exactly one artefact and a handful of verbs; everything else is machinery they can ignore
+until it pages them.**
+
+**Developer contract — one file, three interactions:**
+
+1. **Start**: fill a GitLab issue form ("New experiment": name, BU, one-line hypothesis).
+   The control project requests the lease via the ISB API, creates the repo from the stage
+   template, and replies on the issue with the repo link and SSO deep-link into the leased
+   account. The developer never sees the ISB UI, lease templates, or blueprints.
+2. **Build**: `agentcore dev` + `git push`. The generated `.gitlab-ci.yml` is a single
+   pinned include and **never edited**; the pipeline reads everything else from
+   `causeway.yml` — the only platform file a developer touches:
+
+   ```yaml
+   # causeway.yml — the developer's entire platform surface
+   unit: bu-payments/triage-agent
+   stage: explore              # changing this line via MR = requesting promotion
+   eval_suite: bu-payments/evals/triage-agent@0.3
+   owners: [jburns]
+   release: 7                  # catalog release train; bumped by bot MR, not by hand
+   ```
+
+3. **Promote**: open an MR that changes `stage:`. The pipeline runs the evidence verifier;
+   green verifier = the MR is approvable; merge triggers the control project to execute the
+   transition (next lease tier or S3 rebuild handover). Decline/extend/harvest decisions at
+   lease thresholds arrive as **bot-authored issues with action buttons**, not as emails
+   from an unfamiliar system.
+
+   Everything else — manifests, lineage stamps, evidence, lease renewals under threshold,
+   harvest, blueprint registration — is generated or bot-authored. If a developer ever
+   hand-edits a manifest, the verifier rejects it: machine-written means machine-verified.
+
+   Status lives where the developer already looks: MR widgets (verifier verdict, eval
+   deltas vs baseline), the repo's environments page (one environment per stage), and a
+   stage badge. No separate portal.
+
+**Operator contract — two operated things, four alarms:**
+
+The platform team runs exactly two artefacts beyond the estates it already owns
+(GitLab itself, the AgentCore/Bedrock estate, the ISB deployment):
+
+1. The **control project** (§4.1) — orchestration as trigger-driven pipelines. Nothing to
+   host, patch, or scale; no database (state of record stays in ISB and GitLab; all jobs
+   are idempotent re-derivations from those two APIs).
+2. The **catalog monorepo** (§4.1) — every component, policy pack, template, bootstrap,
+   and the verifier CLI, released as **one train**: a single `release: N` that consumer
+   repos pin and a bot bumps. Operators upgrade the platform by cutting one release;
+   rollback is re-pinning one number. (Internally components keep semver for review
+   hygiene; externally there is only the train.)
+
+On-call carries **four alarms**, all rare-by-design: harvest timeout racing cleanup,
+account quarantined, drift detected, verifier failure *at an approved gate* (verifier
+failures in ordinary MRs are the developer's signal, not the operator's). Budget and
+duration enforcement stay ISB's job — the platform team does not re-implement them.
+
 ## 3. The stage ladder (D4 — recommendation: four stages)
 
 Three stages smear hardening into either incubation or pre-prod; a continuous score is
@@ -152,29 +213,34 @@ label in GitLab. One source of truth (the manifest), two enforcement projections
 ISB is **extended via its API and events, never forked** (single exception: SCP JSON,
 which ISB structures for customisation and which the CCoE owns anyway).
 
-### 4.1 New components (platform-team owned)
+### 4.1 New components (platform-team owned): two operated things (D17)
 
-1. **Causeway Orchestrator** — a small service (or scheduled pipeline) that is the only
-   writer of promotion manifests. Subscribes to the ISB EventBridge bus; calls the ISB
-   REST API (`/leases`, `/leaseTemplates`, `/blueprints`); calls the GitLab API.
-2. **Event bridge to GitLab** — EventBridge → API Destination → GitLab pipeline-trigger
-   tokens. ISB has no webhooks; this is the missing nervous system. Key routes:
+1. **The control project (`causeway-control`)** — orchestration as trigger-driven GitLab
+   pipelines, not a service. EventBridge → API Destination → pipeline-trigger token is the
+   only plumbing; each route triggers an idempotent job that re-derives intent from the ISB
+   and GitLab APIs (the two systems of record — **no new database**). The control project
+   is the only writer of promotion manifests and the only caller of ISB's write APIs
+   (`/leases`, `/leaseTemplates`, `/blueprints`). ISB has no webhooks; this is the missing
+   nervous system. Key routes:
    - `LeaseApproved` → **create repo from the stage template immediately** (D15) and run
      the S0 bootstrap pipeline — every experiment is born with its outer loop attached
    - lease `durationThreshold` alerts → open "decide: graduate/extend/harvest" issue
    - `CleanAccountRequest` (pre-cleanup) → **harvest pipeline** (§4.4), which must
      complete (or time out) before cleanup proceeds
    - `AccountDriftDetected`, `AccountCleanupFailed` → platform alerts
-3. **GitLab CI/CD Catalog namespace `causeway/`** — the standardised outer loop (§6.4).
-4. **Evidence verifier** (D14) — a versioned catalog component + small verification CLI
-   run inside the promotion pipeline; checks the evidence ledger (signatures, digests,
-   threshold results, lineage) and records its verdict as a signed pipeline artifact.
-   Deliberately not a standing service in v1 — nothing to operate, patch, or secure;
-   extract to a service only if external auditors require an API.
-5. **Stage bootstraps as ISB blueprints** — Service Catalog products rendered to
-   CloudFormation StackSets and registered via `/blueprints`, so ISB itself deploys the
-   stage baseline at lease provisioning (OIDC trust role for GitLab runners, OTel/ADOT
-   wiring, log shipping, per-stage network posture).
+2. **The catalog monorepo (`causeway-catalog`)** — one repo, one release train, holding
+   everything versioned: the CI/CD Catalog components (§6.4), the policy packs, the
+   **evidence verifier** (D14 — a component + small CLI run in the promotion pipeline,
+   verdict recorded as a signed artifact; deliberately not a standing service), the agent
+   artefact templates, and the **stage bootstraps** (Service Catalog products rendered to
+   CloudFormation StackSets; the catalog's *own release pipeline* registers them with ISB
+   via `/blueprints` — blueprint registration is never a manual operator step). Each
+   bootstrap deploys the stage baseline at lease provisioning: OIDC trust role for GitLab
+   runners, OTel/ADOT wiring, log shipping, per-stage network posture.
+
+   Cutting catalog release `N` is the **only platform upgrade mechanism**: components are
+   published, bootstraps re-rendered and re-registered, and a bot opens `release: N` bump
+   MRs on consumer repos. Rollback = re-pin `N-1`.
 
 ### 4.2 Identity spine
 
@@ -202,7 +268,7 @@ On lease end without graduation, the harvest pipeline runs **before** cleanup:
    deferred to v2 per D13 — v2 trigger is the first park-and-revive demand.)
 5. Write the **experiment record** (AI-DLC inception/elaboration artefacts + outcome +
    decision: park / kill / revive) to the BU's catalog area.
-6. Signal the orchestrator → cleanup proceeds → account recycles. Nothing of value dies
+6. Signal the control project → cleanup proceeds → account recycles. Nothing of value dies
    with the account; the account stays disposable.
 
 ---
@@ -274,24 +340,22 @@ regression against your own baseline blocks promotion.
 
 ### 6.4 The standardised outer loop — `causeway/` CI/CD Catalog components
 
-GitLab **CI/CD Catalog components** (typed `spec.inputs`, semver, self-contained — not
-legacy `include:template`) are the propagation vehicle for the pipeline half of
-composition. Illustrative consumption — the whole per-repo pipeline is this:
+GitLab **CI/CD Catalog components** (typed `spec.inputs`, semver internally — not legacy
+`include:template`) are the propagation vehicle for the pipeline half of composition.
+Per the simplicity contract (§2.4), the per-repo CI file is a single pinned include that
+**never changes after generation**; all variability lives in `causeway.yml`:
 
 ```yaml
-# .gitlab-ci.yml — generated into the repo by the stage template; owned by the catalog
+# .gitlab-ci.yml — generated once by the stage template; owned by the catalog
 include:
-  - component: gitlab.example.com/causeway/stage-pipeline@2
-    inputs:
-      stage: incubate          # explore | incubate | harden | preprod
-      agent_dir: agentcore/
-      policy_pack: causeway/policy-packs/iac@1.4
-      eval_suite: bu-payments/evals/triage-agent@0.3
+  - component: gitlab.example.com/causeway/pipeline@7   # pin == causeway.yml `release`
 ```
 
-The `stage` input selects which jobs are advisory vs blocking. Stage escalation is a
-one-line MR authored by the orchestrator. Components are enforced instance-wide via
-**compliance pipelines** on the BU groups, so a repo cannot opt out of its stage tier.
+The `pipeline` component reads `causeway.yml` (stage, eval suite, owners) at runtime and
+selects which jobs run and which are advisory vs blocking. Stage escalation is therefore
+a one-line `stage:` change in `causeway.yml` via MR (§2.4). Components are additionally
+enforced instance-wide via **compliance pipelines** on the BU groups, so a repo cannot
+opt out of its stage tier by editing either file.
 
 ### 6.5 Skills-based generation inside the gates (the rest of the puzzle)
 
@@ -397,11 +461,15 @@ between leases, so AWS-side partitioning buys little until one of these triggers
 ## 11. Gap analysis → epics and stories
 
 What must be built (ISB gives none of this), in dependency order. "No tech debt" mandates
-are inlined.
+are inlined. **Delivery collapses onto the two operated things (D17)**: E1+E7 land in the
+control project; E2, E3, E5, E9 are all catalog-monorepo content on the release train;
+E4+E6 split between catalog (verifier, policy packs) and the AgentCore estate (signing
+keys, Cedar, model policy); E8 is config, not software. Nothing in this table creates a
+third thing to operate.
 
 | # | Epic | Key stories | Payoff |
 |---|---|---|---|
-| E1 | **Event bridge & orchestrator** | EventBridge→GitLab trigger routes; lease-via-API GitLab component (`causeway/lease@1`: request/renew/freeze/terminate from a pipeline); orchestrator as the sole manifest writer | Foundation — everything else hangs off it |
+| E1 | **Control project** | EventBridge→GitLab trigger routes; lease-via-API GitLab component (`causeway/lease@1`: request/renew/freeze/terminate from a pipeline); control project as the sole manifest writer | Foundation — everything else hangs off it |
 | E2 | **Stage bootstraps** | Service Catalog→blueprint rendering pipeline; S0/S1/S2 bootstrap products (OIDC trust, OTel, network posture); blueprint registration via `/blueprints` | Removes all manual account prep; makes stage real at provision time |
 | E3 | **`causeway/` pipeline catalog** | stage-pipeline component; policy packs (OPA/cdk-nag) as versioned components; replay-runner; eval-runner (agentcore evaluators); harvest pipeline; evidence verifier | The standardised outer loop itself |
 | E4 | **Evidence & attestation** | manifest schema + verifier CLI; cosign+KMS signing; SLSA-L1 provenance wiring; release-evidence conventions; runtime-evidence reference resolver | The attest-to-promote mechanism |
@@ -426,7 +494,7 @@ template, and component semver-released with a deprecation policy.
 | Risk | Mitigation |
 |---|---|
 | CCoE never ships per-stage SCP tiers | Ladder still binds via pipeline+Cedar+model policy (§2.3); document residual infra-API exposure per stage |
-| Harvest hook races cleanup | Orchestrator freezes lease first; cleanup waits on harvest signal with hard timeout |
+| Harvest hook races cleanup | Control project freezes lease first; cleanup waits on harvest signal with hard timeout |
 | Eval flakiness blocks promotion unfairly | Trials-with-thresholds, baseline-relative gates, quarantine-and-rerecord flow for cassettes |
 | Catalog becomes a bottleneck | E9 contribution path with SLA; S0 permissiveness means experiments never wait on catalog |
 | agentcore-cli churn (52 releases/yr) | Pin CLI version per catalog component release; upgrade as a versioned component change |
@@ -442,7 +510,37 @@ template, and component semver-released with a deprecation policy.
 
 ---
 
-## 14. Iteration record
+## 14. The "no simpler" floor (D18) and operator runbook
+
+### 14.1 What may not be simplified away
+
+Each of these is the minimum mechanism for a property the platform exists to provide.
+Simplification proposals that touch them need a replacement mechanism, not a deletion:
+
+| Irreducible | Property it carries | The tempting "simpler" version, and why it fails |
+|---|---|---|
+| Four stages | explainable, auditable governance ramp | a continuous risk score — unauditable, unexplainable to a CISO |
+| Evidence verifier at every gate | promotion = verified evidence, not opinion | "green pipeline = promotable" — conflates build success with attestation |
+| Digest-pinned OCI from S1; same digest S2→S3 | artefact identity across accounts | rebuild-per-stage — severs the evidence chain at exactly the wall |
+| Lineage stamping on skill-adapted instances | generation without trust | "the skill is approved, so its output is" — trust in generation, the original sin |
+| Harvest-before-nuke with completion signal | no knowledge dies with an account | nuke-on-expiry — recreates the wall as an outcome |
+| Pinned models + thresholded trials at gates | deterministic verdicts over stochastic content | single-run evals on floating models — flaky gates, incomparable baselines |
+| CCoE ownership boundary (§2.3) | governance binds in layers we actually control | "just ask for org admin" — a dependency dressed as a simplification |
+
+### 14.2 Operator runbook (the whole of day-2)
+
+- **Install** (once): deploy ISB (CCoE assists with the AccountPool stack); create the
+  control project + EventBridge API Destination; seed the catalog and cut release 1;
+  create BU groups with compliance frameworks.
+- **Upgrade**: cut catalog release N; bot bumps consumers; watch the four alarms (§2.4).
+- **Rollback**: re-pin release N−1 (bot MRs), re-register prior blueprints (automatic on
+  the rollback release cut).
+- **Break-glass**: freeze lease via ISB API → investigate in-account via SSO → resume or
+  terminate. Quarantined accounts follow stock ISB retry-cleanup flow.
+- **On-call surface**: the four alarms only — harvest timeout, quarantine, drift,
+  verifier failure at an approved gate. Everything else is a developer-facing signal.
+
+## 15. Iteration record
 
 **Resolved in v0.2** (stakeholder interview, 2026-06-12):
 
@@ -451,7 +549,15 @@ template, and component semver-released with a deprecation policy.
 3. Repo timing — **created at lease approval**, outer loop attached from birth (D15).
 4. Evidence verifier — **catalog component + CLI**, no standing service (D14).
 
-**Remaining for v0.3:**
+**Resolved in v0.3** (simplification pass, "as simple as possible, but no simpler"):
+
+5. Developer surface collapsed to **one file (`causeway.yml`), three interactions** (D16, §2.4).
+6. Operator surface collapsed to **two operated things** — control project (no service,
+   no database) + catalog monorepo on a single release train (D17, §4.1); on-call reduced
+   to four alarms; delivery of all nine epics mapped onto those two things (§11).
+7. The simplicity floor codified — seven irreducibles with their failure modes (D18, §14).
+
+**Remaining for v0.4:**
 
 1. Who arbitrates the catalog contribution path (E9) — platform team only, or trusted BU
    maintainers with platform review? (Default until decided: platform team only.)
