@@ -1,6 +1,8 @@
 # The Graduated Innovation Stage ("Causeway")
 
-**Spec v0.3 — 2026-06-12 — status: iterated; simplicity contract applied (§2.4, §15)**
+**Spec v0.4 — 2026-06-12 — status: extracted into the Causeway repo; decisions D1–D18 are
+mirrored as immutable ADRs in [`docs/adr/`](adr/); interview record in [`ANSWERS.md`](ANSWERS.md);
+refinement process in [`REFINEMENT.md`](REFINEMENT.md)**
 
 Extending **Innovation Sandbox on AWS (ISB)** into a first-class SDLC stage, so agentic
 workloads built under AI-DLC graduate from a prudently permissive sandbox to pre-prod
@@ -526,6 +528,7 @@ Simplification proposals that touch them need a replacement mechanism, not a del
 | Harvest-before-nuke with completion signal | no knowledge dies with an account | nuke-on-expiry — recreates the wall as an outcome |
 | Pinned models + thresholded trials at gates | deterministic verdicts over stochastic content | single-run evals on floating models — flaky gates, incomparable baselines |
 | CCoE ownership boundary (§2.3) | governance binds in layers we actually control | "just ask for org admin" — a dependency dressed as a simplification |
+| **No unbounded waits; verify artifacts, never programs** | every control-project wait is deadline-bounded (cleanup always wins eventually); every gate judges a finite artifact against decidable predicates | "wait for harvest to complete" / "verify the generated code is correct" — both are halting-problem-shaped and unsound as stated |
 
 ### 14.2 Operator runbook (the whole of day-2)
 
