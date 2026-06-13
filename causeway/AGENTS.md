@@ -14,8 +14,8 @@ spike implementations when tasked.
 
 ## Map
 
-- `docs/SPEC.md` — normative spec (current: v0.8). §0 decision log D1–D24 is load-bearing.
-- `docs/adr/` — 19 immutable ADRs. **Never edit an accepted ADR**; supersede with a new one.
+- `docs/SPEC.md` — normative spec (current: v0.9). §0 decision log D1–D28 is load-bearing.
+- `docs/adr/` — 23 immutable ADRs. **Never edit an accepted ADR**; supersede with a new one.
 - `docs/ANSWERS.md` — interview record; append-only.
 - `docs/REFINEMENT.md` — the refinement loop. **If asked to "refine", "iterate", or
   "take this through a loop", follow that document exactly** (FRAME → INTERVIEW →

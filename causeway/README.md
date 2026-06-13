@@ -55,9 +55,12 @@ simplified away.
 
 | Artifact | What it is |
 |---|---|
-| [`docs/SPEC.md`](docs/SPEC.md) | The full specification (v0.4) — stages, architecture, evidence model, epics |
+| [`docs/PRFAQ.md`](docs/PRFAQ.md) | Press release + FAQ — the out-of-band pitch by stakeholder |
+| [`docs/TENETS.md`](docs/TENETS.md) | The tenets — tie-break ordered, each citing its ADRs |
+| [`docs/MENTAL-MODEL.md`](docs/MENTAL-MODEL.md) | One-page mental model: the wall→ramp, parcel+passport, customs |
+| [`docs/SPEC.md`](docs/SPEC.md) | The full specification (v0.9) — stages, self-asserted governance, evidence, epics |
 | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Component and sequence views (diagrams) |
-| [`docs/adr/`](docs/adr/) | 14 immutable Architecture Decision Records — the *why* behind every load-bearing choice |
+| [`docs/adr/`](docs/adr/) | 23 immutable Architecture Decision Records — the *why* behind every load-bearing choice |
 | [`docs/ANSWERS.md`](docs/ANSWERS.md) | The stakeholder interview record that produced the decisions |
 | [`docs/REFINEMENT.md`](docs/REFINEMENT.md) | The refinement loop: how this spec evolves, by humans or CLI agents |
 | [`docs/SPIKES.md`](docs/SPIKES.md) | Spike 0 — the three assumptions that must become facts before roadmap commitment |
@@ -67,7 +70,7 @@ simplified away.
 
 ## Status
 
-Specification, v0.4. No production code yet — deliberately. Spike 0
+Specification, v0.9. No production code yet — deliberately. Spike 0
 ([`docs/SPIKES.md`](docs/SPIKES.md)) converts the three riskiest assumptions into facts
 before any roadmap is committed. The build order after that is
 [`docs/SPEC.md` §11](docs/SPEC.md): control project first, catalog second.

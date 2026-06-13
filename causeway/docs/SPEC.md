@@ -1,7 +1,9 @@
 # The Graduated Innovation Stage ("Causeway")
 
-**Spec v0.8 — 2026-06-13 — status: onboarding + docs publishing decided (D23–D24,
-ADR-0018/0019); decisions D1–D24 are mirrored as immutable ADRs in [`docs/adr/`](adr/); interview record in
+**Spec v0.9 — 2026-06-13 — status: self-asserted trust-but-verify governance + attestation
+certificates + portability seam (D25–D28, ADR-0020–0023); comms artifacts added
+([PRFAQ](PRFAQ.md), [TENETS](TENETS.md), [MENTAL-MODEL](MENTAL-MODEL.md)); decisions
+D1–D28 are mirrored as immutable ADRs in [`docs/adr/`](adr/); interview record in
 [`ANSWERS.md`](ANSWERS.md); refinement process in [`REFINEMENT.md`](REFINEMENT.md)**
 
 Extending **Innovation Sandbox on AWS (ISB)** into a first-class SDLC stage, so agentic
@@ -39,6 +41,10 @@ innovation and pre-prod.
 | D22 | Runbook operability | Runbooks are **agent-operatable behind a human-ack boundary**: every step tagged [agent-ok]/[human-ack]/[ccoe] with explicit API calls, verifications and bounds; reversible = autonomous, irreversible = gated (ADR-0017) |
 | D23 | Operator onboarding | Role mapping: ISB Admin = platform only; Manager = BU lead (ISB UI via issue deep-link); User = developer, **headless** — GitLab is the only developer front door. BU-once / developer-once / experiment-per-issue-form; minutes-to-sandbox for auto-approved S0 (ADR-0018, runbooks/onboarding.md) |
 | D24 | Docs publishing | **Docs-as-code to GitLab Pages** (MkDocs Material, strict build, default-branch merges); wiki rejected — no MR review, breaks the traceability invariant (ADR-0019) |
+| D25 | Self-asserted governance | **Inner loop unless an agent adjudicates risk or commercial/cost exposure**: self-assert to move; trust-but-verify with revocation; four-eyes only on adjudicated elevation and at S2→S3. Authority moves from platform-held to self-asserted-and-earned (§2.5, ADR-0020) |
+| D26 | Risk/cost adjudicator | A fail-safe, monotonic **adjudicator skill** classifies risk + commercial/cost per change; trip-wire packs are authoritative, reasoning is additive-only, ambiguity escalates; its verdict is itself evidence ([skill spec](../.kiro/specs/risk-cost-adjudicator/requirements.md), ADR-0021) |
+| D27 | Attestation certificates | Each stage transition issues a signed, human-readable **certificate** (evidence + adjudication + approvers + verifying release), **published to the docs site** as the unit's stamped passport; revocation is append-only (§9.3, ADR-0022) |
+| D28 | Portability seam | **GitLab-centric by choice, not by trap**: manifests, certificates, and adjudicator verdicts are tool-neutral data; GitLab approval rules / Pages / catalog are the current binding. No portability abstraction tax paid in v1 (ADR-0023) |
 
 ---
 
@@ -202,6 +208,39 @@ On-call carries **four alarms**, all rare-by-design: harvest timeout racing clea
 account quarantined, drift detected, verifier failure *at an approved gate* (verifier
 failures in ordinary MRs are the developer's signal, not the operator's). Budget and
 duration enforcement stay ISB's job — the platform team does not re-implement them.
+
+### 2.5 Self-asserted governance: inner loop by default, four-eyes on adjudicated elevation (D25/D26)
+
+The earlier model implied a synchronous gate at every promotion. That over-taxes the
+common case, where most changes carry no real risk. The governing principle is now:
+
+> **Inner loop unless an agent adjudicates risk or commercial/cost exposure.**
+
+Three moving parts make this safe rather than merely fast:
+
+1. **Self-assertion.** Crossing a stage line, the developer (or their agent) *asserts*
+   readiness by the one-line `causeway.yml` change. The assertion buys **motion**, never
+   the stamp — it does not substitute for evidence (see floor §14.1).
+2. **The adjudicator** (a catalog skill, [`.kiro/specs/risk-cost-adjudicator/`](../.kiro/specs/risk-cost-adjudicator/requirements.md);
+   ADR-0021). On every change it classifies two axes — **risk** (IAM, off-catalog
+   resources, network/egress, data class, model) and **commercial/cost** (spend
+   trajectory vs. budget, licensing, egress cost) — and returns `self-assertable` or
+   `four-eyes-required`. It is **fail-safe and monotonic**: a versioned trip-wire policy
+   pack is authoritative; model-assisted reasoning may *add* escalations but never clear
+   a ruled one; ambiguity defaults to escalation; **S2→S3 is always four-eyes** (the
+   governed-estate boundary). The adjudicator's own verdict is recorded as evidence.
+3. **Trust-but-verify, with revocation** (ADR-0020). A `self-assertable` promotion
+   proceeds **provisionally**: the verifier still runs, asynchronously; if its evidence
+   fails, the certificate is **revoked and the unit frozen**. A `four-eyes-required`
+   promotion **blocks** on both the routed second approval (risk → security CODEOWNERS;
+   cost → BU budget owner) and the verifier before any certificate issues.
+
+This is how authority moves from platform-held to **self-asserted**: the right to
+self-assert is earned by a unit's attestation history and revoked by failure (tenet 11).
+Ceremony is rationed to adjudicated elevation and the one hard boundary — everywhere else,
+the loop runs at sandbox speed. The floor property "evidence, not opinion" is preserved
+because a *durable* certificate still requires the verifier to pass; self-assertion only
+relocates *when* the block falls, never *whether* evidence is required.
 
 ## 3. The stage ladder (D4 — recommendation: four stages)
 
@@ -461,7 +500,46 @@ approvals: [{ gate: harden-entry, by: platform-bot, basis: all-required-evidence
 ```
 
 The **evidence verifier** (§4.1) replays this check deterministically; promotion approval
-is "the verifier passed", with humans only on policy-defined exceptions.
+is "the verifier passed", with humans only on adjudicated elevation (§2.5). The manifest
+also carries the adjudicator's verdict as an evidence item:
+
+```yaml
+  - { type: adjudication, verdict: self-assertable, axes: {risk: clear, cost: clear},
+      pack: causeway/adjudicator@1.2, inputs_digest: sha256:aa…, job: 18236 }
+```
+
+### 9.3 Attestation certificates — the certified progression, published (D27)
+
+Each stage transition issues a **certificate**: a signed, human-readable record that
+makes the attestation progression visible and auditable, not buried in pipeline logs.
+The certificate is the durable form of "promotion = verified evidence"; it issues only
+when the verifier passes (and, on `four-eyes-required` transitions, when the routed
+approvals are present). It names: the unit and stage, the artefact digest, the evidence
+items and their verdicts, the adjudicator decision, any human approvers, the catalog
+release that verified it, and the signature.
+
+```yaml
+causeway_certificate: 1
+unit: bu-payments/triage-agent
+stage: harden                 # certified entry to S2
+issued: 2026-06-13T11:40:00Z
+artefact: { image: …@sha256:9f2c…, agentcore_config_digest: sha256:55ab… }
+evidence_digest: sha256:…     # hash of the manifest's evidence block
+adjudication: { verdict: four-eyes-required, axis: cost, reason: "projected spend +38%" }
+approvals:
+  - { axis: cost, by: budget-owner@bu-payments, at: 2026-06-13T11:38Z }
+  - { gate: harden-entry, by: verifier@release-7, basis: all-required-evidence-verified }
+verified_by_release: 7
+status: valid                 # valid | revoked  (revoked carries reason + timestamp)
+sig: …                        # cosign / platform KMS
+```
+
+Certificates are **published to the docs site** (ADR-0019, ADR-0022): a per-unit page
+renders the chain S0→current as a stamped passport, so anyone — a developer, a CISO, an
+auditor — can read a unit's standing and its evidence trail without access to the
+pipelines. Revocation flips `status` and re-publishes; the history is append-only. This
+is the answer to "how is progression through attestation certified, and is it output to
+docs": **yes — the certificate is the certification, and the docs site is where it lives.**
 
 ## 10. Multi-tenancy (D2) and the payoff question
 
@@ -498,6 +576,7 @@ third thing to operate.
 | E7 | **Harvest** | pre-cleanup hook with completion signal; experiment-record generator; park/revive flow (re-vend lease from harvested state); *v2:* Memory-store export (D13) | Stops knowledge loss; enables "revive" which sells the platform to BUs |
 | E8 | **Tenancy v2** | per-BU model quotas/allowlists; deferred AWS-pool partition (trigger-gated, §10) | Per §10 table |
 | E9 | **Catalog contribution path** | pattern-induction MR flow, policy-pack gate, semver release automation | Prevents golden-template rot; closes the loop |
+| E10 | **Self-asserted governance** | risk/cost adjudicator skill (trip-wire packs + monotonic combiner); GitLab conditional approval-rule routing; attestation certificates published to Pages; async-verify-with-revocation | Frees the inner loop; rations ceremony to adjudicated risk/cost; makes the progression auditable (D25–D27) |
 
 **Explicit non-goals (v1):** production stage (stops at pre-prod handover), non-AgentCore
 runtimes, account vending (CCoE's job), building our own eval framework (use AgentCore
@@ -540,7 +619,9 @@ Simplification proposals that touch them need a replacement mechanism, not a del
 | Irreducible | Property it carries | The tempting "simpler" version, and why it fails |
 |---|---|---|
 | Four stages | explainable, auditable governance ramp | a continuous risk score — unauditable, unexplainable to a CISO |
-| Evidence verifier at every gate | promotion = verified evidence, not opinion | "green pipeline = promotable" — conflates build success with attestation |
+| Evidence verifier before every *durable* certificate | promotion = verified evidence, not opinion | "green pipeline = promotable" — conflates build success with attestation. *(Refined by ADR-0020: self-assertion may proceed provisionally, but the durable certificate still requires the verifier — replacement mechanism = async-verify-with-revocation, not a weakening.)* |
+| Self-assertion is provisional and revocable; four-eyes on adjudicated elevation | speed without abandoning evidence; ceremony spent where risk/cost is real | "self-assert and you're done" (drops the async verify + revocation) / "four-eyes on every promotion" (re-taxes the common case the model exists to free) |
+| Adjudicator is fail-safe and monotonic | the agent that rations ceremony cannot be the hole | "let the model decide what's risky" — a reasoning layer that can *clear* a ruled trip-wire; ambiguity that resolves to proceed |
 | Digest-pinned OCI from S1; same digest S2→S3 | artefact identity across accounts | rebuild-per-stage — severs the evidence chain at exactly the wall |
 | Lineage stamping on skill-adapted instances | generation without trust | "the skill is approved, so its output is" — trust in generation, the original sin |
 | Harvest-before-nuke with completion signal | no knowledge dies with an account | nuke-on-expiry — recreates the wall as an outcome |
@@ -602,7 +683,22 @@ target?"):
     BU/developer/experiment cadences with time targets (D23, ADR-0018).
 13. Docs-as-code to GitLab Pages; wiki rejected (D24, ADR-0019).
 
-**Remaining for v0.9:**
+**Resolved in v0.9** (2026-06-13, "promote the concept + move to self-asserted trust-but-verify"):
+
+14. Comms artifacts added as the human on-ramp: [PRFAQ](PRFAQ.md), [TENETS](TENETS.md),
+    [MENTAL-MODEL](MENTAL-MODEL.md).
+15. Governance shifts to **self-asserted, trust-but-verify**: inner loop by default;
+    adjudicator-triggered four-eyes on risk/cost elevation; async-verify-with-revocation
+    preserves the evidence floor (D25/D26, ADR-0020/0021).
+16. **Attestation certificates** published to the docs site = the certified, auditable
+    progression (D27, ADR-0022).
+17. **Portability seam** declared: GitLab-centric binding over tool-neutral data (D28,
+    ADR-0023).
+18. Structural note: SPEC.md (~700 lines) is near the point for a split into linked
+    files; the comms trio is the human front door for now. Candidate for v1.0 cleanup —
+    logged as O3.
+
+**Remaining for v0.10:**
 
 1. Who arbitrates the catalog contribution path (E9) — platform team only, or trusted BU
    maintainers with platform review? (Default until decided: platform team only.)

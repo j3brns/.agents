@@ -26,3 +26,7 @@ back. Each ADR cites the spec sections it governs and the decision-log entries
 | [0017](0017-agent-operable-runbooks.md) | Agent-operatable runbooks behind a human-ack boundary | D22 |
 | [0018](0018-operator-onboarding.md) | Operator onboarding: headless ISB User, GitLab front door | D23 |
 | [0019](0019-docs-as-code-pages.md) | Docs-as-code to GitLab Pages; wiki rejected | D24 |
+| [0020](0020-self-asserted-trust-but-verify.md) | Self-asserted, trust-but-verify; four-eyes on adjudicated elevation | D25 |
+| [0021](0021-risk-cost-adjudicator.md) | Risk & cost adjudicator: fail-safe, monotonic skill | D26 |
+| [0022](0022-attestation-certificates.md) | Attestation certificates: signed, published, revocable | D27 |
+| [0023](0023-gitlab-centric-tool-neutral-data.md) | GitLab-centric binding over tool-neutral data | D28 |

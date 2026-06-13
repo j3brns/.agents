@@ -79,3 +79,21 @@ multiple-choice rounds with delegation allowed ("you decide → recommendation l
 |---|---|---|---|
 | 20 | "How, when, where do individual ISB operators get started and served?" | Role mapping Admin=platform / Manager=BU lead (ISB UI via issue deep-link) / User=developer **headless**; BU-once, developer-once, experiment-per-issue-form onboarding; minutes-to-sandbox target; recurring tickets = documentation bugs | D23, ADR-0018 |
 | 21 | "Repo must publish docs to a collection/wiki on GitLab Pages" | **Docs-as-code on Pages** (MkDocs Material, strict build, on default-branch merge); **wiki rejected** (no MR review, breaks traceability); pages job becomes a catalog component later | D24, ADR-0019 |
+
+## Round 10 — promotion comms + self-asserted governance (2026-06-13)
+
+| Q | Question | Answer | → |
+|---|---|---|---|
+| 22 | "Communicate out of band to promote the concept — PRFAQ, tenets, mental model?" | Built all three as the human on-ramp: [PRFAQ](PRFAQ.md), [TENETS](TENETS.md) (12 tenets, tie-break ordered), [MENTAL-MODEL](MENTAL-MODEL.md) (wall→ramp, parcel+passport, customs) | (deliverables) |
+| 23 | "Is the spec/repo optimally structured?" | Good for machine traceability, weak human on-ramp → comms trio fixes it; SPEC.md ~700 lines is near a split — logged O3 for v1.0 | O3 |
+| 24 | "How is progression through attestation certified; output to docs?" | New **attestation certificates** — signed, per-unit/per-stage, **published to Pages** as a stamped passport; revocation append-only | D27, ADR-0022 |
+| 25 | "How GitLab-centric; how do we move to self-asserted, trust-but-verify?" | GitLab-centric by choice over **tool-neutral data** (portability seam); governance moved to **self-assertion + async-verify-with-revocation** | D25/D28, ADR-0020/0023 |
+| 26 | "Two pairs of eyes on risk/cost elevation — a skill for that? Inner loop unless agent adjudicates." | Yes — the **risk/cost adjudicator skill**: fail-safe, monotonic; four-eyes only on adjudicated risk or commercial/cost elevation (and S2→S3); inner loop otherwise | D26, ADR-0021 |
+
+## Open questions (carry-forward, updated)
+
+| # | Question | Default until answered |
+|---|---|---|
+| O1 | Who arbitrates the catalog contribution path (E9)? | Platform team only |
+| O2 | Permanent naming ("Causeway", stage names)? | Working titles stand |
+| O3 | Split SPEC.md into linked section files at v1.0? | Keep monolithic + comms on-ramp for now |
