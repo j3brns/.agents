@@ -97,3 +97,9 @@ multiple-choice rounds with delegation allowed ("you decide → recommendation l
 | O1 | Who arbitrates the catalog contribution path (E9)? | Platform team only |
 | O2 | Permanent naming ("Causeway", stage names)? | Working titles stand |
 | O3 | Split SPEC.md into linked section files at v1.0? | Keep monolithic + comms on-ramp for now |
+
+## Round 11 — pitch deck (2026-06-13)
+
+| Q | Question | Answer | → |
+|---|---|---|---|
+| 27 | "Make some slick slides — frame it as accelerating fast permissive AI access with progressive conformance, no continuous out-of-band approvals" | Self-contained HTML deck ([`slides/causeway.html`](../slides/causeway.html), 14 slides) + presenter talk-track; acceleration-led narrative, adjudicator + trust-but-verify as the "no continuous approvals" core; published to Pages | (deliverable) |

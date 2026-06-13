@@ -9,6 +9,7 @@ pages:
     - pip install --no-cache-dir mkdocs-material pymdown-extensions
     - cp README.md docs/index.md
     - mkdir -p docs/runbooks && cp runbooks/*.md docs/runbooks/
+    - mkdir -p docs/slides && cp slides/causeway.html docs/slides/index.html
     - mkdocs build --strict --site-dir public
   artifacts:
     paths: [public]

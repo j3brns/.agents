@@ -64,6 +64,7 @@ simplified away.
 | [`docs/ANSWERS.md`](docs/ANSWERS.md) | The stakeholder interview record that produced the decisions |
 | [`docs/REFINEMENT.md`](docs/REFINEMENT.md) | The refinement loop: how this spec evolves, by humans or CLI agents |
 | [`docs/SPIKES.md`](docs/SPIKES.md) | Spike 0 — the three assumptions that must become facts before roadmap commitment |
+| [`slides/causeway.html`](slides/causeway.html) | Slide deck (self-contained HTML) — the pitch; `slides/TALK-TRACK.md` for the talk-track |
 | [`runbooks/`](runbooks/) | Operator day-2: operations, break-glass, harvest failure |
 | [`AGENTS.md`](AGENTS.md) | Operating contract for CLI agents (Kiro, Claude Code, others) working this repo |
 | [`.kiro/`](.kiro/) | Kiro steering + spec-driven-development packages (requirements/design/tasks) |
