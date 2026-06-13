@@ -61,6 +61,7 @@ simplified away.
 
 | Artifact | What it is |
 |---|---|
+| [`HANDOVER.md`](HANDOVER.md) | **Start here if you're picking this up** — current state, build order, first tasks |
 | [`docs/PRFAQ.md`](docs/PRFAQ.md) | Press release + FAQ — the out-of-band pitch by stakeholder |
 | [`docs/TENETS.md`](docs/TENETS.md) | The tenets — tie-break ordered, each citing its ADRs |
 | [`docs/MENTAL-MODEL.md`](docs/MENTAL-MODEL.md) | One-page mental model: the wall→ramp, parcel+passport, customs |

@@ -1,3 +1,7 @@
+> **SUPERSEDED by ADR-0029 (continuous harvest).** Harvest no longer needs a pre-cleanup
+> hold; this is now the **non-blocking confirmation S0-1** (final-flush lead time). Kept for
+> history. Not a buildable unit. See `docs/SPIKES.md` and `docs/adr/0029-continuous-harvest.md`.
+
 # Spike S0-1 — the harvest hold: requirements
 
 Governing ADR: ADR-0008. Claim under test (docs/SPIKES.md S0-1): *stock ISB can delay

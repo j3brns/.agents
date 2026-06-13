@@ -148,3 +148,9 @@ multiple-choice rounds with delegation allowed ("you decide → recommendation l
 | Q | Question | Answer | → |
 |---|---|---|---|
 | 38 | "Too much that can be designed on first/known behaviours is being deferred to spikes" | Correct. New discipline: **design from validated behaviour first; spikes confirm/calibrate, never block** (ADR-0028). Biggest fix: **harvest redesigned continuous** (ADR-0029) — removes the unverified ISB cleanup-hold; old S0-1 demoted to non-blocking. Register reclassified: designed-now / confirm / calibrate, each with its designed answer + fallback | D33/D34, ADR-0028/0029 |
+
+## Round 17 — handover prep for Codex (2026-06-13)
+
+| Q | Question | Answer | → |
+|---|---|---|---|
+| 39 | "Prep the repo for handover to Codex" | Added [`HANDOVER.md`](../HANDOVER.md) (state, build order, first tasks, open questions); made [`AGENTS.md`](../AGENTS.md) Codex-native canonical entry (Codex reads it natively) + design-on-known-behaviour rule; added runnable [`scripts/check.sh`](../scripts/check.sh) consistency check (passes); marked the harvest-hold `.kiro` package superseded by ADR-0029 | (tooling/handover) |

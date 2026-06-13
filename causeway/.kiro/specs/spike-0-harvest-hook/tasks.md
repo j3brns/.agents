@@ -1,3 +1,7 @@
+> **SUPERSEDED by ADR-0029 (continuous harvest).** Harvest no longer needs a pre-cleanup
+> hold; this is now the **non-blocking confirmation S0-1** (final-flush lead time). Kept for
+> history. Not a buildable unit. See `docs/SPIKES.md` and `docs/adr/0029-continuous-harvest.md`.
+
 # Spike S0-1 — tasks
 
 - [ ] 1. Stand up test org + deploy ISB (CCoE-assisted); register 2 accounts (R1)

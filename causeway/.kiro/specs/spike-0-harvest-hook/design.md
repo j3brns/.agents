@@ -1,3 +1,7 @@
+> **SUPERSEDED by ADR-0029 (continuous harvest).** Harvest no longer needs a pre-cleanup
+> hold; this is now the **non-blocking confirmation S0-1** (final-flush lead time). Kept for
+> history. Not a buildable unit. See `docs/SPIKES.md` and `docs/adr/0029-continuous-harvest.md`.
+
 # Spike S0-1 — design
 
 Cites SPEC §4.4 (harvest-then-nuke) and ARCHITECTURE.md §4 (bounded-wait sequence).

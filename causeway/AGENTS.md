@@ -1,6 +1,8 @@
 # AGENTS.md — operating contract for CLI agents
 
-For Kiro, Claude Code, and any other agent working in this repo. Kiro users: the
+For **Codex**, Kiro, Claude Code, and any other agent working in this repo. This file is
+the canonical agent contract (Codex reads `AGENTS.md` natively). **New here? Start with
+[`HANDOVER.md`](HANDOVER.md)** for current state, build order, and first tasks. Kiro users: the
 `.kiro/steering/` files mirror this contract; `.kiro/specs/` holds the
 requirements/design/tasks packages for buildable units.
 
@@ -14,6 +16,8 @@ spike implementations when tasked.
 
 ## Map
 
+- `HANDOVER.md` — **start here**: current state, build order, first tasks, self-check.
+- `scripts/check.sh` — repo consistency check (ADR count/index/versions/decisions). Run before committing.
 - `docs/SPEC.md` — normative spec (current: v0.12). §0 decision log D1–D34 is load-bearing.
 - `docs/adr/` — 29 immutable ADRs. **Never edit an accepted ADR**; supersede with a new one.
 - `docs/ANSWERS.md` — interview record; append-only.
@@ -40,6 +44,9 @@ spike implementations when tasked.
    ask (2–4 options, recommended default first); delegation is a valid, logged answer.
 6. No unbounded waits in anything you design; gates verify finite artifacts, never
    programs (ADR-0006, ADR-0008).
+6b. **Design from validated behaviour first** (§4.5 coherence map); a spike only *confirms*
+   a narrow external unknown or *calibrates* a magnitude — it never blocks the build, and
+   must state the designed answer + fallback (ADR-0028). Never invent ISB behaviour.
 7. Conventions: UK English in prose; Mermaid for diagrams; one MR per refinement
    iteration; commit messages state the iteration (e.g. "refine: v0.5 — resolve O1").
 
