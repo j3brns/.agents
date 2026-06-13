@@ -1,5 +1,9 @@
 # Runbook — onboarding (BUs, developers, managers)
 
+> **Personas — who runs which part:** the **platform engineer** sets up a BU; the
+> **BU lead / Manager** approves leases; the **developer** (headless ISB *User*) just files
+> the issue form; the **CCoE engineer** does the IdC group sync. Each step below says which.
+
 How individual operators get started and served (D23, ADR-0018). Authority tags per
 [README.md](README.md). The front door for everyone except platform admins is **GitLab +
 the docs site** — the ISB web UI is platform/manager territory only.

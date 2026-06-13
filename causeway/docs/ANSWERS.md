@@ -173,3 +173,9 @@ multiple-choice rounds with delegation allowed ("you decide → recommendation l
 | Q | Question | Answer | → |
 |---|---|---|---|
 | 43 | "No sprawl/ad-hoc scripts (durable methods only; ad-hoc → .scratch); no patches/wrappers/tech-debt (not in production); explain every rule with a why; AGENTS.md is curated; defer commits until docs updated + reviewed for flow/correctness" | Added to the curated rules file (AGENTS.md), **not** as ADRs (that would be the sprawl being warned against). Rewrote all hard rules **each with a why-case**; added rules 7–11 (durable-only + `.scratch/`, no-tech-debt-pre-prod, no-sprawl, AGENTS-is-curated, commit-discipline). Created gitignored `.scratch/`; reinforced the REFINEMENT GATE with the flow/correctness review-before-commit | (governance; AGENTS.md, REFINEMENT.md) |
+
+## Round 21 — persona-fy the runbooks (2026-06-13)
+
+| Q | Question | Answer | → |
+|---|---|---|---|
+| 44 | "Are the runbooks persona-fied?" | Honestly: were **authority-tagged** ([agent-ok]/[human-ack]/[ccoe]) but **not persona-headed**. Fixed: each runbook now declares **who runs it** (platform on-call engineer · ops agent · CCoE engineer · BU lead/Manager · developer), and the runbooks README carries a **persona legend** mapping each tag to a named actor — so a reader knows *who they are* on the page, not just what actor-class may act. Enhancement of ADR-0017; no new decision | (docs; runbooks) |

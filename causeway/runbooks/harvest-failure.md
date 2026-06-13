@@ -1,5 +1,8 @@
 # Runbook — harvest timeout / partial harvest
 
+> **Persona — who runs this:** the platform **on-call engineer** + the **ops agent**;
+> the **CCoE engineer** only if cleanup itself is stuck (quarantine path).
+
 Context: ADR-0008. Harvest is idempotent and incremental; cleanup always wins.
 A timeout = *partial* capture, recorded as fact. Authority tags per [README.md](README.md).
 

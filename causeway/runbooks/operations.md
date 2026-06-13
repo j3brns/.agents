@@ -1,5 +1,9 @@
 # Runbook — operations (install, upgrade, rollback, alarms)
 
+> **Persona — who runs this:** the platform **on-call engineer** (human) drives; the
+> **ops agent** (Codex/Kiro/Claude) executes `[agent-ok]` steps unaided; the **CCoE engineer**
+> owns `[ccoe]` handoffs. If you are a developer or BU lead, this runbook is not yours.
+
 The whole of day-2. Authority tags per [README.md](README.md) (ADR-0017). If an
 operational task isn't in these runbooks, it shouldn't exist yet (ADR-0014).
 

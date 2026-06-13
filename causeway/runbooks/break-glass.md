@@ -1,5 +1,8 @@
 # Runbook — break-glass
 
+> **Persona — who runs this:** the platform **on-call engineer** (human) decides; the
+> **ops agent** prepares and verifies the calls. Not the developer, not the BU lead.
+
 For incidents inside a leased sandbox account (runaway spend ISB hasn't caught,
 credential exposure, hostile workload). Authority tags per [README.md](README.md).
 
