@@ -53,3 +53,9 @@ multiple-choice rounds with delegation allowed ("you decide → recommendation l
 |---|---|---|
 | O1 | Who arbitrates the catalog contribution path (E9)? | Platform team only |
 | O2 | Permanent naming ("Causeway", stage names)? | Working titles stand |
+
+## Round 6 — SCP authority (2026-06-13)
+
+| Q | Question | Answer | → |
+|---|---|---|---|
+| 16 | "What if I do control SCPs — why would that help, do we want it?" / "Be opinionated: what is the target?" | **Target: delegated SCP admin over the AccountPool OU subtree**, landed before first S2 entry; detective-only is launch posture only; whole-org ownership refused permanently; fallback = per-unit risk-acceptance sign-off at S2 entry | D19, ADR-0015 |

@@ -1,8 +1,8 @@
 # The Graduated Innovation Stage ("Causeway")
 
-**Spec v0.4 — 2026-06-12 — status: extracted into the Causeway repo; decisions D1–D18 are
-mirrored as immutable ADRs in [`docs/adr/`](adr/); interview record in [`ANSWERS.md`](ANSWERS.md);
-refinement process in [`REFINEMENT.md`](REFINEMENT.md)**
+**Spec v0.5 — 2026-06-13 — status: SCP target posture decided (D19, ADR-0015); decisions
+D1–D19 are mirrored as immutable ADRs in [`docs/adr/`](adr/); interview record in
+[`ANSWERS.md`](ANSWERS.md); refinement process in [`REFINEMENT.md`](REFINEMENT.md)**
 
 Extending **Innovation Sandbox on AWS (ISB)** into a first-class SDLC stage, so agentic
 workloads built under AI-DLC graduate from a prudently permissive sandbox to pre-prod
@@ -33,6 +33,7 @@ innovation and pre-prod.
 | D16 | Developer surface | **One file, three interactions** (§2.4): developers edit only `causeway.yml`; start / push / promote-by-MR. ISB UI, manifests, CI config and lease mechanics are never developer-facing |
 | D17 | Operator surface | **Two operated things** (§4.1): a trigger-driven **control project** (orchestrator-as-pipelines, no service, no database) and a **catalog monorepo** on a single release train (`release: N`) |
 | D18 | Simplicity floor | "No simpler" list (§15): stages, verifier, digest pinning, lineage, harvest-before-nuke, pinned-model evals, and the CCoE boundary are irreducible and may not be optimised away |
+| D19 | SCP target posture | **Preventive stage enforcement is the target**: negotiate **delegated SCP admin over the AccountPool OU subtree** with the CCoE, landed before first S2 entry. Detective-only = launch posture only. Whole-org SCP ownership refused permanently. Fallback if delegation declined: per-unit risk-acceptance sign-off at S2 entry (§2.3, ADR-0015) |
 
 ---
 
@@ -116,11 +117,23 @@ Therefore:
 - **Progressive governance is enforced primarily in layers we own**: GitLab compliance
   pipelines, protected environments, push rules, runner isolation; and AgentCore Cedar
   policies, Gateway target allowlists, Bedrock model-access policies, AgentCore Identity.
-- The **OU/SCP ladder is consumed, not authored**: ISB ships its SCP set; per-stage SCP
-  tiers (§3) are a **declared dependency on the CCoE**, expressed as a reviewed contribution
-  to their ISB fork of the policy JSON. The spec is designed to degrade gracefully — if the
-  CCoE only operates stock ISB SCPs, stages S1–S2 still bind via pipeline + Cedar + model
-  policy; we lose only infra-API breadth control.
+- The **OU/SCP ladder is consumed, not authored — at launch**: ISB ships its SCP set;
+  per-stage SCP tiers (§3) are a **declared dependency on the CCoE**, expressed as a
+  reviewed contribution to their ISB fork of the policy JSON. The spec degrades
+  gracefully — with stock ISB SCPs only, stages S1–S2 still bind via pipeline + Cedar +
+  model policy; we lose only infra-API breadth control.
+- **Target posture (D19, ADR-0015) — this is the destination, not an option**:
+  **delegated SCP administration scoped to the ISB AccountPool OU subtree**, negotiated
+  with the CCoE starting now and landed **before any unit reaches S2**. Detective-only
+  enforcement is the launch posture, never the end state: an agentic workload holds AWS
+  credentials and calls APIs directly, so only a preventive, account-wide control closes
+  the gap between "the pipeline would have caught it" and "it could not happen". With
+  OU-scoped authority, S2's IaC-only rule becomes a deny-unless-pipeline-OIDC-role SCP
+  condition instead of a drift alarm. Whole-org SCP ownership is **refused permanently**
+  (org blast radius, Nuke/SCP coupling, regulated-surface accountability — ADR-0011's
+  reasoning stands). If the CCoE declines delegation, S2 entry acquires a standing
+  risk-acceptance sign-off per unit — making the residual risk *their* recurring
+  decision, not our silent default.
 - **Pre-prod accounts are vended by the CCoE's landing-zone machinery** (AFT or LZA pattern):
   promotion to S3 is a *rebuild from the attested repo* into a governed account — consistent
   with ISB's design truth that recycled accounts retain no state.
@@ -560,7 +573,14 @@ Simplification proposals that touch them need a replacement mechanism, not a del
    to four alarms; delivery of all nine epics mapped onto those two things (§11).
 7. The simplicity floor codified — seven irreducibles with their failure modes (D18, §14).
 
-**Remaining for v0.4:**
+**Resolved in v0.5** (stakeholder directive, 2026-06-13: "be opinionated — what is the
+target?"):
+
+8. SCP authority — **target = delegated SCP admin over the AccountPool OU subtree**,
+   landed before first S2 entry; detective-only is launch posture; whole-org ownership
+   refused; fallback = per-unit risk acceptance at S2 (D19, ADR-0015, §2.3).
+
+**Remaining for v0.6:**
 
 1. Who arbitrates the catalog contribution path (E9) — platform team only, or trusted BU
    maintainers with platform review? (Default until decided: platform team only.)

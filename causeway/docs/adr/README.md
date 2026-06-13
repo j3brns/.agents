@@ -21,3 +21,4 @@ back. Each ADR cites the spec sections it governs and the decision-log entries
 | [0012](0012-verifier-as-component.md) | Verifier as catalog component, not service | D14 |
 | [0013](0013-repo-at-lease-approval.md) | Repo at lease approval | D15 |
 | [0014](0014-simplicity-contract.md) | Simplicity contract + "no simpler" floor | D16–D18 |
+| [0015](0015-delegated-ou-scoped-scp-authority.md) | Target: delegated OU-scoped SCP authority (refines 0011) | D19 |
