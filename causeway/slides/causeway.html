@@ -46,6 +46,9 @@
   .num{color:var(--cyan);font-weight:800;font-variant-numeric:tabular-nums;min-width:1.4em}
   .svgwrap{margin-top:18px;display:flex;justify-content:center}
   .svgwrap svg{width:100%;max-width:1020px;height:auto}
+  .mermaid{display:flex;justify-content:center;margin-top:14px;min-height:40px}
+  .mermaid svg{max-width:960px;width:100%;height:auto}
+  .mermaid:not([data-processed]){color:var(--dim);font-size:13px;font-family:ui-monospace,monospace;white-space:pre;display:block;opacity:.4}
   .cap{color:var(--dim);font-size:14px;margin-top:14px;text-align:center;max-width:70ch;margin-left:auto;margin-right:auto}
   .vignette{font-size:clamp(19px,2.3vw,27px);line-height:1.5;max-width:34ch}
   .vignette b{color:var(--fg)} .vignette .t{color:var(--amber);font-weight:700;font-variant-numeric:tabular-nums}
@@ -165,15 +168,15 @@
           <text x="300" y="120" text-anchor="middle" font-size="34" fill="#fb7185">?</text>
         </svg>
       </div>
-      <p class="cap"><span class="em">Innovation theatre:</span> a prototype that works dies on a schedule and is rebuilt months later, badly.
-        The wall doesn’t keep risk out — it keeps <i>evidence</i> from ever being collected.</p>
+      <p class="cap">Today a working prototype usually dies at lease end, and gets rebuilt later from memory.
+        The wall doesn’t stop risk — it stops the evidence ever being collected.</p>
     </div>
   </section>
 
   <!-- 5 WALL -> RAMP (SVG) -->
   <section class="slide">
     <div class="wrap">
-      <div class="eyebrow">The reframe — the whole idea, in one picture</div>
+      <div class="eyebrow">The reframe</div>
       <h2>Replace the wall with a <span class="grad">ramp</span>.</h2>
       <div class="svgwrap">
         <svg viewBox="0 0 1020 330" role="img" aria-label="A wall transforming into an ascending ramp of four stages">
@@ -296,6 +299,29 @@
     </div>
   </section>
 
+  <!-- 7b DECISION FLOW (mermaid) -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="eyebrow">The same call, every push</div>
+      <h2>When do the keys come out?</h2>
+      <div class="mermaid">
+flowchart LR
+  P["push / promote"] --> A{"adjudicator<br/>risk · cost · in envelope?"}
+  A -->|"clear"| S["self-assert, keep moving<br/>verify async · revoke if it fails"]
+  A -->|"elevated, in envelope"| K["two keys, in the crew<br/>≥1 independent of author · ≤1 agent"]
+  A -->|"beyond envelope"| O["call shore<br/>(the exception)"]
+  S --> C["certificate"]
+  K --> C
+  C --> R["next SCP tier attaches<br/>preventive · monotonic"]
+  classDef go fill:#0e2a22,stroke:#1f6b52,color:#d1fae5;
+  classDef stop fill:#241a10,stroke:#7c5a1f,color:#fde8c7;
+  class S,C,R go;
+  class O stop;
+      </div>
+      <p class="cap">Most pushes are clear and never stop. The keys are for the few that aren’t.</p>
+    </div>
+  </section>
+
   <!-- 8 THE CAGE (SVG) -->
   <section class="slide">
     <div class="wrap">
@@ -368,6 +394,36 @@
     </div>
   </section>
 
+  <!-- 11b C4 CONTAINER (mermaid) -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="eyebrow">For the build-side — the system in context (C4 container)</div>
+      <h2>Two things we run. The rest we wrap.</h2>
+      <div class="mermaid">
+flowchart TB
+  crew(["crew: builder + agent"]):::actor
+  ciso(["CISO / auditor"]):::actor
+  subgraph GL["GitLab — we own"]
+    cat["causeway-catalog<br/>components · verifier · policy packs"]
+    ctrl["causeway-control<br/>trigger pipelines · no service, no DB"]
+    pages["Pages — published certificates"]
+  end
+  subgraph AWS["AWS"]
+    isb["Innovation Sandbox<br/>leases · OUs · Nuke"]
+    ac["Bedrock AgentCore<br/>runtime · gateway · evals"]
+  end
+  crew -->|"causeway.yml + push"| cat
+  cat -->|"OIDC role"| isb
+  cat -->|"deploy · eval"| ac
+  ctrl <-->|"REST + EventBridge"| isb
+  ctrl -->|"repos · certs"| pages
+  ciso -->|"reads standing"| pages
+  classDef actor fill:#101a30,stroke:#818cf8,color:#eaf0fb;
+      </div>
+      <p class="cap">Wrapped via API, never forked. The two boxes under “we own” are the whole operational surface.</p>
+    </div>
+  </section>
+
   <!-- 12 ASK -->
   <section class="slide">
     <div class="wrap">
@@ -405,6 +461,16 @@
     if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){e.preventDefault();go(cur()-1);}
     if(e.key==='Home')go(0);if(e.key==='End')go(slides.length-1);});
   update();
+</script>
+<script type="module">
+  // Renderer pulled from CDN (pinned). If offline, the bespoke-SVG slides still carry the deck.
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({startOnLoad:false, securityLevel:'loose', theme:'base', themeVariables:{
+    fontFamily:'ui-sans-serif,system-ui,sans-serif', fontSize:'15px',
+    primaryColor:'#101a30', primaryBorderColor:'#3b4a73', primaryTextColor:'#eaf0fb',
+    lineColor:'#7c8db0', secondaryColor:'#16223c', tertiaryColor:'#0c1426',
+    clusterBkg:'rgba(129,140,248,0.06)', clusterBorder:'#3b4a73'}});
+  mermaid.run({querySelector:'.mermaid'}).catch(()=>{});
 </script>
 </body>
 </html>
