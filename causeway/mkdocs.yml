@@ -1,0 +1,23 @@
+site_name: Causeway
+site_description: The graduated innovation stage — sandbox to pre-prod without the wall
+repo_url: https://gitlab.example.com/platform/causeway   # set on GitLab import
+docs_dir: docs
+theme:
+  name: material
+  features: [navigation.sections, navigation.top, content.code.copy, toc.follow]
+markdown_extensions:
+  - admonition
+  - tables
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+nav:
+  - Home: index.md
+  - Specification: SPEC.md
+  - Architecture: ARCHITECTURE.md
+  - Decisions (ADRs): adr/README.md
+  - Interview record: ANSWERS.md
+  - Refinement loop: REFINEMENT.md
+  - Spikes: SPIKES.md

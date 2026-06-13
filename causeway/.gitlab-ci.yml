@@ -1,0 +1,14 @@
+# Docs-as-code publishing (D24, ADR-0019). Activates when this directory lands on the
+# GitLab instance as its own project. The runbooks/, AGENTS.md and README.md are copied
+# into the site at build time so docs/ stays the single nav root.
+pages:
+  image: python:3.12-slim
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  script:
+    - pip install --no-cache-dir mkdocs-material pymdown-extensions
+    - cp README.md docs/index.md
+    - mkdir -p docs/runbooks && cp runbooks/*.md docs/runbooks/
+    - mkdocs build --strict --site-dir public
+  artifacts:
+    paths: [public]

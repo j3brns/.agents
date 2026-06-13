@@ -1,7 +1,7 @@
 # The Graduated Innovation Stage ("Causeway")
 
-**Spec v0.7 — 2026-06-13 — status: runbooks made agent-operatable (D22, ADR-0017);
-decisions D1–D22 are mirrored as immutable ADRs in [`docs/adr/`](adr/); interview record in
+**Spec v0.8 — 2026-06-13 — status: onboarding + docs publishing decided (D23–D24,
+ADR-0018/0019); decisions D1–D24 are mirrored as immutable ADRs in [`docs/adr/`](adr/); interview record in
 [`ANSWERS.md`](ANSWERS.md); refinement process in [`REFINEMENT.md`](REFINEMENT.md)**
 
 Extending **Innovation Sandbox on AWS (ISB)** into a first-class SDLC stage, so agentic
@@ -37,6 +37,8 @@ innovation and pre-prod.
 | D20 | Fork rule | We wrap, never fork: `causeway-control` is the single ISB facade. Forking permitted only behind **three sequential gates** — S0-1 finds no hold, AND upstream contribution rejected, AND fallback race window unacceptable (ADR-0016) |
 | D21 | Left-shift rule | **Preview left, mint centrally**: the gate's verifier/policy/replay checks run locally as advisory `causeway verify` (same binary+versions as the gate); evidence is admissible only from platform runners with platform keys; agentcore-cli consumed, never forked or wrapped (ADR-0016) |
 | D22 | Runbook operability | Runbooks are **agent-operatable behind a human-ack boundary**: every step tagged [agent-ok]/[human-ack]/[ccoe] with explicit API calls, verifications and bounds; reversible = autonomous, irreversible = gated (ADR-0017) |
+| D23 | Operator onboarding | Role mapping: ISB Admin = platform only; Manager = BU lead (ISB UI via issue deep-link); User = developer, **headless** — GitLab is the only developer front door. BU-once / developer-once / experiment-per-issue-form; minutes-to-sandbox for auto-approved S0 (ADR-0018, runbooks/onboarding.md) |
+| D24 | Docs publishing | **Docs-as-code to GitLab Pages** (MkDocs Material, strict build, default-branch merges); wiki rejected — no MR review, breaks the traceability invariant (ADR-0019) |
 
 ---
 
@@ -594,7 +596,13 @@ target?"):
 11. Runbooks upgraded to agent-operatable: authority tags, explicit API verbs,
     verifications and bounds, dry-run rehearsal until deployment (D22, ADR-0017).
 
-**Remaining for v0.8:**
+**Resolved in v0.8** (2026-06-13):
+
+12. Operator onboarding defined: headless ISB User, GitLab-only developer front door,
+    BU/developer/experiment cadences with time targets (D23, ADR-0018).
+13. Docs-as-code to GitLab Pages; wiki rejected (D24, ADR-0019).
+
+**Remaining for v0.9:**
 
 1. Who arbitrates the catalog contribution path (E9) — platform team only, or trusted BU
    maintainers with platform review? (Default until decided: platform team only.)

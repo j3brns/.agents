@@ -24,3 +24,5 @@ back. Each ADR cites the spec sections it governs and the decision-log entries
 | [0015](0015-delegated-ou-scoped-scp-authority.md) | Target: delegated OU-scoped SCP authority (refines 0011) | D19 |
 | [0016](0016-wrap-dont-fork-mint-centrally.md) | Wrap, don't fork; preview left, mint centrally | D20, D21 |
 | [0017](0017-agent-operable-runbooks.md) | Agent-operatable runbooks behind a human-ack boundary | D22 |
+| [0018](0018-operator-onboarding.md) | Operator onboarding: headless ISB User, GitLab front door | D23 |
+| [0019](0019-docs-as-code-pages.md) | Docs-as-code to GitLab Pages; wiki rejected | D24 |

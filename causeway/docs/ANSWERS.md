@@ -72,3 +72,10 @@ multiple-choice rounds with delegation allowed ("you decide → recommendation l
 | Q | Question | Answer | → |
 |---|---|---|---|
 | 19 | "Are the runbooks Kiro-operatable?" | Readable yes, executable no — fixed: every step tagged **[agent-ok] / [human-ack] / [ccoe]**, API verbs explicit, verifications and bounds stated, dry-run rehearsal until deployment | D22, ADR-0017 |
+
+## Round 9 — operator onboarding and docs publishing (2026-06-13)
+
+| Q | Question | Answer | → |
+|---|---|---|---|
+| 20 | "How, when, where do individual ISB operators get started and served?" | Role mapping Admin=platform / Manager=BU lead (ISB UI via issue deep-link) / User=developer **headless**; BU-once, developer-once, experiment-per-issue-form onboarding; minutes-to-sandbox target; recurring tickets = documentation bugs | D23, ADR-0018 |
+| 21 | "Repo must publish docs to a collection/wiki on GitLab Pages" | **Docs-as-code on Pages** (MkDocs Material, strict build, on default-branch merge); **wiki rejected** (no MR review, breaks traceability); pages job becomes a catalog component later | D24, ADR-0019 |
