@@ -1,0 +1,6 @@
+# Scratch space: ad-hoc, throwaway scripts and experiments live here and are NEVER
+# committed. Durable tooling belongs in ../scripts/ (named, owned, maintained).
+# Ignore everything except this file and the README that explains the convention.
+*
+!.gitignore
+!README.md

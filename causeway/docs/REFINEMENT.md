@@ -32,7 +32,9 @@ produced v0.1→v0.4; this document makes it repeatable.
    spikes ([`SPIKES.md`](SPIKES.md)): each spike has a falsifiable claim, a deadline,
    and a fallback design. Spike results are appended to SPIKES.md and linked from the
    ADR they confirm or break (a broken assumption ⇒ superseding ADR, go to step 3).
-6. **GATE** — before merge, run the traceability check (below). Then loop, or stop when
+6. **GATE** — before merge, run the traceability check (below) **and read every changed doc
+   through for flow and correctness — defer the commit until that review passes** (AGENTS.md
+   rule 11: a change and its docs land together, reviewed as one). Then loop, or stop when
    the open-question list is empty and all Spike-0 claims are facts — that state is
    **v1.0: roadmap-committable**.
 

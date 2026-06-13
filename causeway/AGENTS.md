@@ -31,26 +31,70 @@ spike implementations when tasked.
   whose downstream artifacts don't move is incomplete).
 - `.kiro/specs/<unit>/` — requirements.md (EARS), design.md, tasks.md per buildable unit.
 
-## Hard rules
+## Hard rules — and why each exists
 
-1. **Traceability invariant** (REFINEMENT.md): answer → Dnn → ADR → spec section →
-   downstream artifact, unbroken both ways. Run this check before proposing a merge.
-2. ADRs immutable; ANSWERS.md append-only; SPEC version bumps exactly once per
-   refinement MR with §15 updated.
-3. The "no simpler" floor (SPEC §14.1) may only be weakened by a superseding ADR that
-   names a replacement mechanism.
-4. Never invent capabilities for ISB, agentcore-cli, or GitLab — verify against current
-   docs/source first; both move fast. Mark unverified claims as assumptions and route
-   them to SPIKES.md.
-5. Decisions belong to the stakeholder. When a choice is load-bearing and undecided,
-   ask (2–4 options, recommended default first); delegation is a valid, logged answer.
-6. No unbounded waits in anything you design; gates verify finite artifacts, never
-   programs (ADR-0006, ADR-0008).
-6b. **Design from validated behaviour first** (§4.5 coherence map); a spike only *confirms*
-   a narrow external unknown or *calibrates* a magnitude — it never blocks the build, and
-   must state the designed answer + fallback (ADR-0028). Never invent ISB behaviour.
-7. Conventions: UK English in prose; Mermaid for diagrams; one MR per refinement
-   iteration; commit messages state the iteration (e.g. "refine: v0.5 — resolve O1").
+A rule without a reason can't be applied at the edges. Each rule carries its **why** so you
+can reason about cases it doesn't literally cover, instead of either ignoring it or obeying
+it blindly.
+
+1. **Traceability invariant** — answer → Dnn (SPEC §0) → ADR → spec section → downstream
+   artifact, unbroken both ways; run `scripts/check.sh` and the REFINEMENT gate before any
+   commit. *Why: the whole value of this repo is that one source of truth maps cleanly onto
+   every artifact. A broken link means a reader can't tell what's true, and the next agent
+   inherits a guess instead of a fact.*
+2. **ADRs are immutable — supersede, never edit. ANSWERS.md is append-only. SPEC version
+   bumps once per refinement iteration (§15 updated).** *Why: decisions are a historical
+   record. Editing one rewrites history and hides why we changed course; superseding keeps
+   both the old reasoning and the correction, so a settled trade-off isn't re-litigated.*
+3. **The "no simpler" floor (SPEC §14.1) is weakened only by a superseding ADR that names a
+   replacement mechanism.** *Why: each floor item carries a property the system exists to
+   provide; "simplifying" one usually deletes that property silently. Demanding a
+   replacement makes the cost explicit and refusable.*
+4. **Never invent capabilities for ISB, agentcore-cli, or GitLab. Design from validated
+   behaviour (§4.5 coherence map); a spike only *confirms* a narrow unknown or *calibrates*
+   a magnitude — it never blocks the build, and must state its designed answer + fallback
+   (ADR-0028). Unverified → mark as assumption, route to SPIKES.md.** *Why: these move fast,
+   and a wrong assumption propagates into every dependent decision. The coherence map exists
+   so the design rests on facts, not hopes — and so spikes stop being a place to defer
+   design.*
+5. **Decisions belong to the stakeholder.** Load-bearing + undecided → ask (2–4 options,
+   recommended first; delegation is a valid, logged answer). *Why: an agent guessing a
+   load-bearing call produces confident, unowned architecture the stakeholder never chose —
+   and that is the most expensive kind to unwind later.*
+6. **No unbounded waits; gates verify finite artifacts, never programs (ADR-0006/0008).**
+   *Why: "wait until done" and "verify the generated code is correct" are halting-problem-
+   shaped — unsound as stated. Deadlines and decidable predicates are the only honest forms.*
+7. **Durable methods only; ad-hoc scripts go in `.scratch/` (gitignored).** Anything that
+   lands in `scripts/` is named, owned, and maintained; throwaways never enter the tracked
+   tree. *Why: a one-off script left in the repo becomes unowned cruft — the next agent
+   fears to delete it and may mistake it for a dependency. `.scratch/` lets you experiment
+   freely without polluting the durable surface. Prefer ephemeral inline commands over
+   committing a script you won't maintain.*
+8. **No patches, shims, or wrappers that create tech debt — this service is not in
+   production.** There is no deployed system to stay compatible with and no data to migrate,
+   so a "temporary" workaround has all the cost and none of the excuse. Fix the root, change
+   the design, or supersede the ADR. *Why: tech debt is a loan against a future that isn't
+   constrained yet. Taking it pre-production is pure loss — you pay interest to protect
+   nothing. (Note: wrapping an external dependency at its boundary — ISB, the CLI — is the
+   opposite and is required; see ADR-0001/0016. The ban is on internal hacks-around-our-own-
+   design.)*
+9. **No sprawl — one home per thing.** Decisions in ADRs, the record in ANSWERS, methods in
+   `scripts/`, the contract here. Never create a second place for the same truth. *Why: two
+   copies drift, and the moment they disagree the traceability invariant is broken and
+   readers must guess which is real.*
+10. **This file is a curated resource — edit it deliberately, keep it tight, keep the
+    why-cases.** *Why: it's the contract every agent loads first. Casual additions erode its
+    authority and grow its length until people stop reading it — and then the rules stop
+    working at all.*
+11. **Commit discipline: defer every commit until all affected docs are updated *and* read
+    through for flow and correctness.** A change and its documentation land together,
+    reviewed as one. *Why: a commit that updates spec/code before the docs catch up makes
+    the repo briefly lie about itself. Batching the doc update with a flow read-through keeps
+    the record always-true and readable — not merely structurally consistent.*
+12. **Conventions:** UK English in prose; Mermaid for doc diagrams, inline SVG for the deck;
+    one logical change per commit; commit subjects state the iteration (e.g.
+    `refine: v0.14 — resolve O1`); never push to another branch without permission; no PR
+    unless asked. *Why: consistency is what lets a reader skim; every surprise costs attention.*
 
 ## Common tasks
 

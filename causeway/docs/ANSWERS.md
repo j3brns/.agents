@@ -167,3 +167,9 @@ multiple-choice rounds with delegation allowed ("you decide → recommendation l
 | Q | Question | Answer | → |
 |---|---|---|---|
 | 42 | "Are all 29 ADRs worthy of that status?" | No — and the index now says so. Tiered: **~10 Foundational** (reverse = redesign), **~12 Core** (significant, real trade-off), **5 Tactical** (0012/0013/0017/0018/0019 — defensible but modest operational/UX choices, logged for traceability not depth), **1 Process** (0028). Two partially superseded (0008 mechanism→0029; 0026 framing→0027), kept for history | (honesty; ADR index) |
+
+## Round 20 — durability & commit governance (2026-06-13)
+
+| Q | Question | Answer | → |
+|---|---|---|---|
+| 43 | "No sprawl/ad-hoc scripts (durable methods only; ad-hoc → .scratch); no patches/wrappers/tech-debt (not in production); explain every rule with a why; AGENTS.md is curated; defer commits until docs updated + reviewed for flow/correctness" | Added to the curated rules file (AGENTS.md), **not** as ADRs (that would be the sprawl being warned against). Rewrote all hard rules **each with a why-case**; added rules 7–11 (durable-only + `.scratch/`, no-tech-debt-pre-prod, no-sprawl, AGENTS-is-curated, commit-discipline). Created gitignored `.scratch/`; reinforced the REFINEMENT GATE with the flow/correctness review-before-commit | (governance; AGENTS.md, REFINEMENT.md) |
