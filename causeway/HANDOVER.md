@@ -7,7 +7,7 @@ it is the thin extension that consumes ISB via its API and events.
 
 - **Git root**: `/home/user/.agents` · **this project**: `causeway/` (all doc paths are
   relative to `causeway/`). · **Branch**: `claude/great-bardeen-9b9lpl`. · **No PR open.**
-- **State**: spec **v0.12**, **29 ADRs** (D1–D34). **No production code yet — by design.**
+- **State**: spec **v0.13**, **29 ADRs** (tiered by significance), decision log **D1–D34**. **No production code yet — by design.**
 - **Canonical agent contract**: [`AGENTS.md`](AGENTS.md) (Codex reads this natively). Read
   it first; this file is the orientation layer on top of it.
 
