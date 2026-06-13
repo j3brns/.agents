@@ -3,246 +3,335 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Causeway — fast, permissive AI access with conformance that ramps</title>
+<title>Causeway — a sunny day in August, and the journey to it</title>
 <style>
   :root{
     --ink:#070b16; --ink2:#0c1426; --panel:#101a30; --line:#22304d;
     --fg:#eaf0fb; --mut:#93a4c4; --dim:#6b7da0;
-    --indigo:#6366f1; --cyan:#22d3ee; --emerald:#10b981; --amber:#f59e0b; --rose:#fb7185;
+    --indigo:#818cf8; --cyan:#22d3ee; --emerald:#10b981; --amber:#f59e0b; --rose:#fb7185;
     --grad:linear-gradient(100deg,#818cf8,#22d3ee);
     --grad2:linear-gradient(100deg,#f59e0b,#fb7185);
-    --maxw:1100px;
+    --maxw:1120px;
   }
   *{box-sizing:border-box}
   html,body{margin:0;height:100%}
-  body{
-    background:var(--ink); color:var(--fg);
-    font:400 18px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial;
-    -webkit-font-smoothing:antialiased;
-  }
+  body{background:var(--ink);color:var(--fg);
+    font:400 18px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial;-webkit-font-smoothing:antialiased}
   .deck{height:100vh;overflow-y:scroll;scroll-snap-type:y mandatory;scroll-behavior:smooth}
-  .slide{
-    min-height:100vh;scroll-snap-align:center;position:relative;
-    display:flex;flex-direction:column;justify-content:center;
-    padding:7vh 8vw;overflow:hidden;
+  .slide{min-height:100vh;scroll-snap-align:center;position:relative;display:flex;flex-direction:column;justify-content:center;
+    padding:6vh 7vw;overflow:hidden;
     background:radial-gradient(1200px 700px at 80% -10%,rgba(99,102,241,.10),transparent 60%),
-               radial-gradient(900px 600px at -10% 110%,rgba(34,211,238,.08),transparent 55%);
-  }
-  .slide::after{content:"";position:absolute;inset:0;pointer-events:none;
-    background:linear-gradient(transparent 70%,rgba(0,0,0,.25))}
-  .eyebrow{letter-spacing:.32em;text-transform:uppercase;font-size:12px;font-weight:700;color:var(--cyan);margin-bottom:22px}
+               radial-gradient(900px 600px at -10% 110%,rgba(34,211,238,.08),transparent 55%)}
+  .slide.sunny{background:radial-gradient(900px 600px at 82% 8%,rgba(245,158,11,.16),transparent 55%),
+               radial-gradient(900px 600px at -5% 110%,rgba(34,211,238,.07),transparent 55%)}
+  .slide::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(transparent 72%,rgba(0,0,0,.22))}
+  .eyebrow{letter-spacing:.32em;text-transform:uppercase;font-size:12px;font-weight:700;color:var(--cyan);margin-bottom:20px}
   .eyebrow.amber{color:var(--amber)}
-  h1{font-size:clamp(40px,7vw,86px);line-height:1.02;margin:0;font-weight:800;letter-spacing:-.02em}
-  h2{font-size:clamp(30px,4.6vw,56px);line-height:1.05;margin:0 0 18px;font-weight:800;letter-spacing:-.02em}
+  h1{font-size:clamp(38px,6.4vw,80px);line-height:1.02;margin:0;font-weight:800;letter-spacing:-.02em}
+  h2{font-size:clamp(28px,4.3vw,52px);line-height:1.06;margin:0 0 16px;font-weight:800;letter-spacing:-.02em}
   .grad{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
   .grad2{background:var(--grad2);-webkit-background-clip:text;background-clip:text;color:transparent}
-  .lede{font-size:clamp(19px,2.3vw,27px);color:var(--mut);max-width:24ch;line-height:1.35}
-  .lede.wide{max-width:40ch}
-  .sub{color:var(--dim);font-size:16px;margin-top:26px;max-width:60ch}
+  .lede{font-size:clamp(18px,2.2vw,25px);color:var(--mut);max-width:30ch;line-height:1.35}
+  .lede.wide{max-width:46ch}
+  .sub{color:var(--dim);font-size:16px;margin-top:22px;max-width:62ch}
   .wrap{max-width:var(--maxw);width:100%;margin:0 auto}
-  .kicker{font-size:clamp(28px,3.4vw,44px);font-weight:800;letter-spacing:-.01em;line-height:1.12}
-  .big{font-size:clamp(54px,11vw,150px);font-weight:900;letter-spacing:-.04em;line-height:.9}
-  .row{display:flex;gap:26px;flex-wrap:wrap}
-  .col{flex:1 1 0;min-width:240px}
-  .card{background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.01));
-    border:1px solid var(--line);border-radius:16px;padding:22px 24px}
-  .card h3{margin:0 0 8px;font-size:18px;letter-spacing:.01em}
-  .card p{margin:0;color:var(--mut);font-size:15px;line-height:1.45}
-  .tag{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
-    padding:5px 11px;border-radius:999px;border:1px solid var(--line);color:var(--mut);background:rgba(255,255,255,.02)}
-  .muted{color:var(--mut)} .dim{color:var(--dim)}
-  .em{color:var(--fg);font-weight:700}
-  ul.clean{list-style:none;padding:0;margin:18px 0 0}
-  ul.clean li{padding:10px 0;border-top:1px solid var(--line);display:flex;gap:14px;align-items:baseline}
+  .em{color:var(--fg);font-weight:700}.muted{color:var(--mut)}.dim{color:var(--dim)}
+  .row{display:flex;gap:24px;flex-wrap:wrap}.col{flex:1 1 0;min-width:230px}
+  .card{background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.01));border:1px solid var(--line);border-radius:16px;padding:20px 22px}
+  .card h3{margin:0 0 8px;font-size:18px}.card p{margin:0;color:var(--mut);font-size:15px;line-height:1.45}
+  .tag{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:5px 11px;border-radius:999px;border:1px solid var(--line);color:var(--mut)}
+  ul.clean{list-style:none;padding:0;margin:16px 0 0}
+  ul.clean li{padding:9px 0;border-top:1px solid var(--line);display:flex;gap:14px;align-items:baseline}
   ul.clean li:first-child{border-top:0}
   .num{color:var(--cyan);font-weight:800;font-variant-numeric:tabular-nums;min-width:1.4em}
-
-  /* progress + counter */
+  .svgwrap{margin-top:18px;display:flex;justify-content:center}
+  .svgwrap svg{width:100%;max-width:1020px;height:auto}
+  .cap{color:var(--dim);font-size:14px;margin-top:14px;text-align:center;max-width:70ch;margin-left:auto;margin-right:auto}
+  .vignette{font-size:clamp(19px,2.3vw,27px);line-height:1.5;max-width:34ch}
+  .vignette b{color:var(--fg)} .vignette .t{color:var(--amber);font-weight:700;font-variant-numeric:tabular-nums}
+  .quote{font-size:clamp(22px,3.2vw,38px);font-weight:700;line-height:1.28;max-width:26ch}
+  .final{font-size:clamp(21px,2.9vw,36px);line-height:1.3;font-weight:700;max-width:31ch}
   .bar{position:fixed;top:0;left:0;height:3px;background:var(--grad);width:0;z-index:50;transition:width .2s}
   .count{position:fixed;right:16px;bottom:14px;font-size:12px;color:var(--dim);z-index:50;letter-spacing:.1em;font-variant-numeric:tabular-nums}
   .brand{position:fixed;left:18px;bottom:14px;font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--dim);z-index:50}
-  .hint{position:absolute;bottom:7vh;left:8vw;color:var(--dim);font-size:13px;letter-spacing:.04em}
-  .hint kbd{border:1px solid var(--line);border-radius:6px;padding:1px 7px;color:var(--mut);font:inherit;font-size:12px}
-
-  /* wall → ramp visual */
-  .viz{display:flex;align-items:flex-end;gap:6px;height:230px;margin-top:30px}
-  .wallblk{display:flex;align-items:flex-end;gap:18px;height:100%}
-  .side{width:150px;height:62%;border-radius:12px;display:flex;flex-direction:column;justify-content:center;padding:16px;border:1px solid var(--line)}
-  .side small{display:block;color:var(--dim);font-size:11px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px}
-  .side b{font-size:15px}
-  .wallbar{width:14px;height:100%;background:repeating-linear-gradient(45deg,#2a3a5c,#2a3a5c 8px,#1c2944 8px,#1c2944 16px);border-radius:4px;position:relative}
-  .wallbar::after{content:"the wall";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-90deg);white-space:nowrap;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
-  .steps{display:flex;align-items:flex-end;gap:10px;height:100%}
-  .step{width:120px;border-radius:12px 12px 0 0;border:1px solid var(--line);border-bottom:0;padding:12px;display:flex;flex-direction:column;justify-content:flex-end;background:linear-gradient(180deg,rgba(99,102,241,.12),rgba(34,211,238,.04))}
-  .step small{color:var(--cyan);font-size:11px;letter-spacing:.1em;text-transform:uppercase}
-  .step b{font-size:13px;margin-top:4px}
-  .s0{height:46%} .s1{height:62%} .s2{height:80%} .s3{height:100%;background:linear-gradient(180deg,rgba(16,185,129,.20),rgba(16,185,129,.04));border-color:#1f6b52}
-  .arrow{align-self:center;color:var(--dim);font-size:30px;margin:0 14px}
-
-  /* ladder slide */
-  .ladder{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:14px}
-  .rung{border:1px solid var(--line);border-radius:14px;padding:18px;background:linear-gradient(180deg,rgba(255,255,255,.03),transparent)}
-  .rung .st{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan)}
-  .rung.g3 .st{color:var(--emerald)}
-  .rung h4{margin:6px 0 12px;font-size:20px}
-  .rung div.k{font-size:13px;color:var(--mut);padding:6px 0;border-top:1px dashed var(--line)}
-  .rung div.k:first-of-type{border-top:0}
-  .rung div.k b{color:var(--fg);font-weight:600}
-
-  /* flow (adjudicator) */
-  .flow{display:flex;align-items:center;gap:16px;margin-top:26px;flex-wrap:wrap}
-  .node{border:1px solid var(--line);border-radius:14px;padding:16px 20px;background:var(--panel);min-width:150px}
-  .node small{display:block;color:var(--dim);font-size:11px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
-  .node b{font-size:16px}
-  .to{color:var(--dim);font-size:26px}
-  .branch{display:flex;flex-direction:column;gap:12px}
-  .pill{border-radius:12px;padding:14px 18px;border:1px solid var(--line)}
-  .pill.go{background:linear-gradient(100deg,rgba(16,185,129,.16),transparent);border-color:#1f6b52}
-  .pill.stop{background:linear-gradient(100deg,rgba(251,113,133,.14),transparent);border-color:#7c3a4b}
-  .pill b{font-size:15px} .pill span{display:block;color:var(--mut);font-size:13px;margin-top:3px}
-
-  .quote{font-size:clamp(24px,3.4vw,40px);font-weight:700;line-height:1.25;letter-spacing:-.01em;max-width:24ch}
-  .final{font-size:clamp(22px,3vw,38px);line-height:1.3;font-weight:700;max-width:30ch}
-  @media (max-width:720px){.ladder{grid-template-columns:repeat(2,1fr)}.side{width:120px}.step{width:84px}}
-
-  @media print{
-    .deck{height:auto;overflow:visible}
-    .slide{min-height:auto;height:100vh;page-break-after:always;scroll-snap-align:none}
-    .bar,.count,.brand,.hint{display:none}
-  }
+  .hint{position:absolute;bottom:6vh;left:7vw;color:var(--dim);font-size:13px}.hint kbd{border:1px solid var(--line);border-radius:6px;padding:1px 7px;color:var(--mut);font:inherit;font-size:12px}
+  .s-fg{fill:var(--fg)}.s-mut{fill:var(--mut)}.s-dim{fill:var(--dim)}
+  text{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  @media print{.deck{height:auto;overflow:visible}.slide{min-height:auto;height:100vh;page-break-after:always}.bar,.count,.brand,.hint{display:none}}
 </style>
 </head>
 <body>
-<div class="bar" id="bar"></div>
-<div class="brand">Causeway</div>
-<div class="count" id="count">01</div>
-
+<div class="bar" id="bar"></div><div class="brand">Causeway</div><div class="count" id="count">01</div>
 <div class="deck" id="deck">
 
-  <!-- 1 -->
-  <section class="slide">
+  <!-- 1 TITLE -->
+  <section class="slide sunny">
     <div class="wrap">
-      <div class="eyebrow">Agentic development, sandbox → pre-prod</div>
-      <h1>Fast, permissive<br>access to build <span class="grad">agents</span>.<br>
-        Conformance that <span class="grad2">ramps</span>, not gates.</h1>
-      <p class="sub"><span class="em">Agentic development first.</span> Give a team a live
-        agent-build sandbox in minutes — and let conformance accumulate as the work matures,
-        <span class="em">without continuous out-of-band approvals.</span></p>
+      <div class="eyebrow amber">Agentic development · sandbox → pre-prod</div>
+      <h1>A sunny day<br>in <span class="grad2">August</span>.</h1>
+      <p class="sub">What does it feel like when building an AI agent is <span class="em">fast and permissive</span>,
+        and governance simply <span class="em">happens</span> — no tickets, no committee, no wall? Start there.
+        Then we’ll walk the journey that makes it real.</p>
     </div>
-    <div class="hint">Use <kbd>→</kbd> / <kbd>Space</kbd> to advance · <kbd>P</kbd>-then-Print for PDF</div>
+    <div class="hint">Use <kbd>→</kbd> / <kbd>Space</kbd> · <kbd>P</kbd> then Print for PDF</div>
   </section>
 
-  <!-- 2 -->
-  <section class="slide">
-    <div class="wrap">
-      <div class="eyebrow">The mandate everyone agrees on</div>
-      <h2>“Get teams fast, permissive<br>access to AI. Now.”</h2>
-      <p class="lede wide">Nobody argues with the goal. The argument is always about the brake —
-        and the brake is <span class="em">approvals</span>.</p>
-    </div>
-  </section>
-
-  <!-- 3 -->
-  <section class="slide">
-    <div class="wrap">
-      <div class="eyebrow amber">The real bottleneck</div>
-      <div class="row" style="align-items:center">
-        <div class="col"><div class="big grad2">weeks</div><p class="muted" style="margin-top:8px">waiting in the approval queue —<br>tickets, reviews, committees, sign-offs</p></div>
-        <div class="col"><div class="big">minutes</div><p class="muted" style="margin-top:8px">of actual building once you’re in</p></div>
+  <!-- 2 VIGNETTE -->
+  <section class="slide sunny">
+    <div class="wrap row" style="align-items:center;gap:40px">
+      <div class="col" style="flex:1.1 1 360px">
+        <div class="eyebrow amber">The sunny day</div>
+        <p class="vignette">
+          <span class="t">09:00</span> — Maya, on the Payments crew, has an idea for a refund-triage agent.<br><br>
+          <span class="t">09:05</span> — She files one issue. A repo and a live AWS sandbox reply with a link. <b>No ticket. No keys to copy.</b><br><br>
+          She builds with her AI pair all morning — <b>fast, permissive, inside the inner loop.</b><br><br>
+          <span class="t">11:30</span> — She promotes to <b>Incubate</b>: one line in a file. Two keys turn — hers and the crew’s agent — and it’s done.<br><br>
+          <span class="t">Thursday</span> — Hardened, attested, a signed certificate published. <b>She never sat in an approval meeting.</b>
+        </p>
       </div>
-      <p class="sub">It isn’t compute and it isn’t the model. It’s the <span class="em">out-of-band, human, serial</span>
-        permission to begin — paid again at every step.</p>
-    </div>
-  </section>
-
-  <!-- 4 -->
-  <section class="slide">
-    <div class="wrap">
-      <div class="eyebrow">The false choice we refuse</div>
-      <div class="row" style="margin-top:10px">
-        <div class="col card"><span class="tag">Option A</span>
-          <h2 style="margin:14px 0 6px;font-size:34px">Move fast</h2>
-          <p>Loosen the rules. Ship the prototype by ejecting it from governance. <span class="dim">Risk you can’t see.</span></p></div>
-        <div class="col card"><span class="tag">Option B</span>
-          <h2 style="margin:14px 0 6px;font-size:34px">Stay safe</h2>
-          <p>Govern the sandbox harder. Now it’s just slow production. <span class="dim">Exploration dies.</span></p></div>
+      <div class="col" style="flex:.9 1 320px">
+        <div class="card"><h3>And yet — all of it was governed</h3>
+          <p>Spend hard-capped. Guardrails tightened at each step, binding even her agent. Every promotion signed and
+            evidenced. The CISO can read its standing without a meeting. <span class="dim">Speed and control, at the same time.</span></p></div>
+        <p class="cap" style="text-align:left;margin-top:18px">This is the “sunny day”. The rest of the deck is the journey that earns it —
+          and quietly handles the rainy days too (revoke, freeze, quarantine).</p>
       </div>
-      <p class="sub" style="font-size:20px;color:var(--fg)">Both are wrong. The problem isn’t the controls —
-        it’s the <span class="grad">discontinuity</span> between them.</p>
     </div>
   </section>
 
-  <!-- 5 -->
-  <section class="slide">
+  <!-- 3 JOURNEY TIMELINE (SVG) -->
+  <section class="slide sunny">
     <div class="wrap">
-      <div class="eyebrow">The reframe</div>
-      <h2>The wall becomes a <span class="grad">ramp</span>.</h2>
-      <div class="viz">
-        <div class="wallblk">
-          <div class="side"><small>Sandbox</small><b>trust nothing,<br>permit everything</b></div>
-          <div class="wallbar"></div>
-          <div class="side"><small>Production</small><b>permit nothing<br>but the attested</b></div>
-        </div>
-        <span class="arrow">➜</span>
-        <div class="steps">
-          <div class="step s0"><small>S0</small><b>Explore</b></div>
-          <div class="step s1"><small>S1</small><b>Incubate</b></div>
-          <div class="step s2"><small>S2</small><b>Harden</b></div>
-          <div class="step s3"><small>S3</small><b>Pre-prod</b></div>
-        </div>
+      <div class="eyebrow amber">Maya’s week, on one line</div>
+      <h2>The journey of <span class="grad2">one idea</span>.</h2>
+      <div class="svgwrap">
+        <svg viewBox="0 0 1020 360" role="img" aria-label="A rising timeline from idea to shipped">
+          <defs>
+            <linearGradient id="sky" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f59e0b"/><stop offset="1" stop-color="#fb7185"/></linearGradient>
+            <linearGradient id="path" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#818cf8"/><stop offset="1" stop-color="#10b981"/></linearGradient>
+          </defs>
+          <!-- sun -->
+          <circle cx="118" cy="74" r="30" fill="url(#sky)"/>
+          <g stroke="#f59e0b" stroke-width="3" stroke-linecap="round" opacity=".8">
+            <line x1="118" y1="20" x2="118" y2="34"/><line x1="118" y1="114" x2="118" y2="128"/>
+            <line x1="64" y1="74" x2="78" y2="74"/><line x1="158" y1="74" x2="172" y2="74"/>
+            <line x1="80" y1="36" x2="90" y2="46"/><line x1="146" y1="102" x2="156" y2="112"/>
+            <line x1="156" y1="36" x2="146" y2="46"/><line x1="90" y1="102" x2="80" y2="112"/>
+          </g>
+          <!-- rising path -->
+          <path d="M60 300 C 260 300, 300 200, 520 200 S 820 110, 980 90" fill="none" stroke="url(#path)" stroke-width="4" stroke-dasharray="2 9" stroke-linecap="round"/>
+          <!-- nodes -->
+          <g font-size="14" font-weight="700">
+            <g transform="translate(120,300)"><circle r="22" fill="#0c1426" stroke="#818cf8" stroke-width="2"/><text class="s-fg" text-anchor="middle" dy="5">💡</text>
+              <text class="s-mut" text-anchor="middle" y="46" font-size="13">09:00 · idea</text></g>
+            <g transform="translate(330,262)"><circle r="22" fill="#0c1426" stroke="#22d3ee" stroke-width="2"/><text class="s-fg" text-anchor="middle" dy="5">📦</text>
+              <text class="s-mut" text-anchor="middle" y="46" font-size="13">09:05 · sandbox</text></g>
+            <g transform="translate(520,200)"><circle r="22" fill="#0c1426" stroke="#22d3ee" stroke-width="2"/><text class="s-fg" text-anchor="middle" dy="6">↻</text>
+              <text class="s-mut" text-anchor="middle" y="46" font-size="13">build · inner loop</text></g>
+            <g transform="translate(720,158)"><circle r="22" fill="#0c1426" stroke="#f59e0b" stroke-width="2"/><text class="s-fg" text-anchor="middle" dy="5">🔑</text>
+              <text class="s-mut" text-anchor="middle" y="46" font-size="13">11:30 · two-key promote</text></g>
+            <g transform="translate(965,90)"><circle r="24" fill="#0c1426" stroke="#10b981" stroke-width="2.5"/><text class="s-fg" text-anchor="middle" dy="6">✓</text>
+              <text class="s-mut" text-anchor="middle" y="48" font-size="13">Thu · attested &amp; shipped</text></g>
+          </g>
+        </svg>
       </div>
-      <p class="sub">Same repo the whole way. Governance rises exactly as fast as the work matures — and never faster.</p>
+      <p class="cap">The path rises as the work matures — the same repo gaining standing, no detour through an approval queue.</p>
     </div>
   </section>
 
-  <!-- 6 -->
+  <!-- 4 THE WALL (SVG) -->
   <section class="slide">
     <div class="wrap">
-      <div class="eyebrow">The one idea</div>
-      <h2>Progressive conformance.</h2>
-      <p class="lede wide">Permissive on day one. Conformance you <span class="em">accrue</span>, not a gate you
-        <span class="em">queue at</span>. Each push generates signed evidence; promotion is a one-line merge request.</p>
-      <p class="sub">No standing committee. No ticket to start. The system collects the proof as a by-product of the work.</p>
-    </div>
-  </section>
-
-  <!-- 7 -->
-  <section class="slide">
-    <div class="wrap">
-      <div class="eyebrow">Day one, for a developer</div>
-      <h2>One file. Three actions. <span class="grad">Minutes</span> to a live AI sandbox.</h2>
-      <ul class="clean">
-        <li><span class="num">1</span><div><b>Start</b> — file a “new experiment” issue. A repo and an AWS account arrive pre-wired. <span class="dim">No keys, no ticket.</span></div></li>
-        <li><span class="num">2</span><div><b>Build</b> — <code>agentcore dev</code> &amp; <code>git push</code>. You never leave the inner loop.</div></li>
-        <li><span class="num">3</span><div><b>Promote</b> — open a merge request that changes one line: <code>stage: explore → incubate</code>.</div></li>
-      </ul>
-    </div>
-  </section>
-
-  <!-- 8 -->
-  <section class="slide">
-    <div class="wrap">
-      <div class="eyebrow amber">The heart of it — launch codes, not a committee</div>
-      <h2>Authority delegated to <span class="grad">qualified crews</span>.<br>Two keys to launch — one may be an agent.</h2>
-      <div class="flow">
-        <div class="node"><small>every change</small><b>your push</b></div>
-        <span class="to">→</span>
-        <div class="node" style="border-color:#3b4a73"><small>adjudicator (agent)</small><b>risk? cost?<br>in envelope?</b></div>
-        <span class="to">→</span>
-        <div class="branch">
-          <div class="pill go"><b>Clear → keep moving</b><span>self-assert; verified in parallel. No human in the path.</span></div>
-          <div class="pill stop"><b>Elevated → two keys, in the crew</b><span>two authorized actors concur · one may be an agent · neither the author.</span></div>
-        </div>
+      <div class="eyebrow">Why that day is impossible today</div>
+      <h2>Between the sandbox and production:<br>a <span class="grad2">wall</span>.</h2>
+      <div class="svgwrap">
+        <svg viewBox="0 0 1020 320" role="img" aria-label="A wall with no door between sandbox and production">
+          <defs><pattern id="brick" width="56" height="34" patternUnits="userSpaceOnUse" patternTransform="rotate(0)">
+            <rect width="56" height="34" fill="#16223c"/><rect width="54" height="32" x="1" y="1" fill="#1b2942"/>
+            <line x1="0" y1="17" x2="56" y2="17" stroke="#0c1426" stroke-width="2"/><line x1="28" y1="0" x2="28" y2="17" stroke="#0c1426" stroke-width="2"/><line x1="0" y1="17" x2="0" y2="34" stroke="#0c1426" stroke-width="2"/></pattern></defs>
+          <!-- left platform -->
+          <rect x="40" y="210" width="330" height="70" rx="10" fill="#101a30" stroke="#22304d"/>
+          <text class="s-mut" x="205" y="245" text-anchor="middle" font-size="15" font-weight="700">SANDBOX</text>
+          <text class="s-dim" x="205" y="266" text-anchor="middle" font-size="12">trust nothing · permit everything · then deleted</text>
+          <!-- right platform -->
+          <rect x="650" y="210" width="330" height="70" rx="10" fill="#101a30" stroke="#22304d"/>
+          <text class="s-mut" x="815" y="245" text-anchor="middle" font-size="15" font-weight="700">PRODUCTION</text>
+          <text class="s-dim" x="815" y="266" text-anchor="middle" font-size="12">permit nothing but the attested</text>
+          <!-- wall -->
+          <rect x="476" y="40" width="68" height="240" fill="url(#brick)" stroke="#0c1426" stroke-width="2"/>
+          <text x="510" y="170" text-anchor="middle" font-size="13" font-weight="800" letter-spacing="3" fill="#6b7da0" transform="rotate(-90 510 170)">THE WALL · NO DOOR</text>
+          <!-- stuck figure -->
+          <g transform="translate(300,150)"><circle cx="0" cy="0" r="13" fill="#0c1426" stroke="#fb7185" stroke-width="2"/><line x1="0" y1="13" x2="0" y2="46" stroke="#fb7185" stroke-width="2"/><line x1="0" y1="22" x2="-16" y2="34" stroke="#fb7185" stroke-width="2"/><line x1="0" y1="22" x2="16" y2="30" stroke="#fb7185" stroke-width="2"/><line x1="0" y1="46" x2="-12" y2="64" stroke="#fb7185" stroke-width="2"/><line x1="0" y1="46" x2="12" y2="64" stroke="#fb7185" stroke-width="2"/></g>
+          <text x="300" y="120" text-anchor="middle" font-size="34" fill="#fb7185">?</text>
+        </svg>
       </div>
-      <p class="sub">The second pair of eyes is <span class="em">in the boat, not on shore</span>. Off-band escalation happens
-        only when an action exceeds the crew’s qualified envelope — the exception, not the rule.</p>
+      <p class="cap"><span class="em">Innovation theatre:</span> a prototype that works dies on a schedule and is rebuilt months later, badly.
+        The wall doesn’t keep risk out — it keeps <i>evidence</i> from ever being collected.</p>
     </div>
   </section>
 
-  <!-- 9 -->
+  <!-- 5 WALL -> RAMP (SVG) -->
   <section class="slide">
     <div class="wrap">
-      <div class="eyebrow">Why this is safe, not just fast</div>
+      <div class="eyebrow">The reframe — the whole idea, in one picture</div>
+      <h2>Replace the wall with a <span class="grad">ramp</span>.</h2>
+      <div class="svgwrap">
+        <svg viewBox="0 0 1020 330" role="img" aria-label="A wall transforming into an ascending ramp of four stages">
+          <defs><linearGradient id="step" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#6366f1" stop-opacity=".10"/><stop offset="1" stop-color="#22d3ee" stop-opacity=".30"/></linearGradient>
+            <linearGradient id="stepg" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#10b981" stop-opacity=".12"/><stop offset="1" stop-color="#10b981" stop-opacity=".42"/></linearGradient></defs>
+          <!-- faded wall -->
+          <g opacity=".35"><rect x="70" y="80" width="48" height="200" fill="#1b2942" stroke="#0c1426"/>
+            <text x="94" y="180" text-anchor="middle" font-size="11" letter-spacing="3" fill="#6b7da0" transform="rotate(-90 94 180)">WALL</text></g>
+          <text x="170" y="180" font-size="40" fill="#6b7da0">→</text>
+          <!-- ascending steps -->
+          <g stroke="#22304d" stroke-width="1.5">
+            <rect x="250" y="210" width="170" height="70" rx="8" fill="url(#step)"/>
+            <rect x="430" y="170" width="170" height="110" rx="8" fill="url(#step)"/>
+            <rect x="610" y="120" width="170" height="160" rx="8" fill="url(#step)"/>
+            <rect x="790" y="64" width="190" height="216" rx="8" fill="url(#stepg)" stroke="#1f6b52"/>
+          </g>
+          <g font-size="13" font-weight="800" letter-spacing="1">
+            <text class="s-fg" x="335" y="240" text-anchor="middle">S0 EXPLORE</text>
+            <text class="s-fg" x="515" y="200" text-anchor="middle">S1 INCUBATE</text>
+            <text class="s-fg" x="695" y="150" text-anchor="middle">S2 HARDEN</text>
+            <text class="s-fg" x="885" y="96" text-anchor="middle">S3 PRE-PROD</text>
+          </g>
+          <g font-size="11" fill="#93a4c4">
+            <text x="335" y="262" text-anchor="middle">permit all</text>
+            <text x="515" y="222" text-anchor="middle">evidence accrues</text>
+            <text x="695" y="172" text-anchor="middle">attestable</text>
+            <text x="885" y="118" text-anchor="middle">operable</text>
+          </g>
+          <!-- climbing figure -->
+          <g transform="translate(515,150)"><circle cx="0" cy="0" r="11" fill="#0c1426" stroke="#22d3ee" stroke-width="2"/><line x1="0" y1="11" x2="0" y2="36" stroke="#22d3ee" stroke-width="2"/><line x1="0" y1="18" x2="14" y2="10" stroke="#22d3ee" stroke-width="2"/><line x1="0" y1="18" x2="-12" y2="26" stroke="#22d3ee" stroke-width="2"/><line x1="0" y1="36" x2="14" y2="50" stroke="#22d3ee" stroke-width="2"/><line x1="0" y1="36" x2="-10" y2="52" stroke="#22d3ee" stroke-width="2"/></g>
+          <path d="M250 300 H 980" stroke="#22304d" stroke-width="1"/>
+          <text class="s-dim" x="615" y="320" text-anchor="middle" font-size="13">one repo, gaining standing — governance rises only as fast as the work earns it</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 RATCHET (SVG) -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="eyebrow">The journey, made structural</div>
+      <h2>Conformance is a <span class="grad">ratchet</span>, not a checkbox.</h2>
+      <div class="svgwrap">
+        <svg viewBox="0 0 1020 340" role="img" aria-label="An account climbing stages, guardrails tightening, a ratchet preventing slip-back">
+          <defs><linearGradient id="acct" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#818cf8"/><stop offset="1" stop-color="#22d3ee"/></linearGradient></defs>
+          <!-- steps with nested (thickening) SCP walls -->
+          <g>
+            <!-- S0 -->
+            <g transform="translate(70,210)"><rect width="190" height="90" rx="10" fill="#0c1426" stroke="#22304d"/>
+              <rect x="58" y="26" width="74" height="44" rx="6" fill="none" stroke="url(#acct)" stroke-width="2"/>
+              <text class="s-fg" x="95" y="52" text-anchor="middle" font-size="12">agent</text>
+              <text class="s-mut" x="95" y="-8" text-anchor="middle" font-size="12" font-weight="800">S0</text></g>
+            <!-- S1 -->
+            <g transform="translate(300,170)"><rect width="190" height="130" rx="10" fill="#0c1426" stroke="#22304d"/>
+              <rect x="40" y="34" width="110" height="64" rx="7" fill="none" stroke="#3b4a73" stroke-width="3"/>
+              <rect x="58" y="48" width="74" height="36" rx="5" fill="none" stroke="url(#acct)" stroke-width="2"/>
+              <text class="s-fg" x="95" y="71" text-anchor="middle" font-size="11">agent</text>
+              <text class="s-mut" x="95" y="-8" text-anchor="middle" font-size="12" font-weight="800">S1</text></g>
+            <!-- S2 -->
+            <g transform="translate(530,120)"><rect width="190" height="180" rx="10" fill="#0c1426" stroke="#22304d"/>
+              <rect x="26" y="34" width="138" height="116" rx="8" fill="none" stroke="#4a5b86" stroke-width="4"/>
+              <rect x="44" y="50" width="102" height="84" rx="7" fill="none" stroke="#3b4a73" stroke-width="3"/>
+              <rect x="62" y="66" width="66" height="52" rx="5" fill="none" stroke="url(#acct)" stroke-width="2"/>
+              <text class="s-fg" x="95" y="96" text-anchor="middle" font-size="11">agent</text>
+              <text class="s-mut" x="95" y="-8" text-anchor="middle" font-size="12" font-weight="800">S2</text></g>
+          </g>
+          <!-- risers with certificate keys -->
+          <g font-size="11" fill="#f59e0b" font-weight="700">
+            <text x="285" y="200" text-anchor="middle">🔑 cert</text>
+            <text x="515" y="150" text-anchor="middle">🔑 cert</text>
+          </g>
+          <!-- ratchet pawl on the right -->
+          <g transform="translate(770,120)">
+            <path d="M0 0 l40 0 l0 24 l-12 -10 l0 24 l-12 -10 l0 24 l-12 -10 l0 24 l-4 -4 Z" fill="#16223c" stroke="#22304d"/>
+            <path d="M44 60 l24 -8 l-6 18 Z" fill="#fb7185"/>
+            <text class="s-dim" x="80" y="60" font-size="12">pawl —</text>
+            <text class="s-dim" x="80" y="78" font-size="12">no slip back</text>
+            <text class="s-dim" x="80" y="96" font-size="12">(monotonic)</text>
+          </g>
+          <line x1="70" y1="300" x2="950" y2="300" stroke="#22304d"/>
+          <text class="s-mut" x="510" y="328" text-anchor="middle" font-size="13">each click attaches a stricter <tspan fill="#eaf0fb" font-weight="700">SCP tier</tspan> — preventive, binding even a credentialed agent — <tspan fill="#eaf0fb" font-weight="700">authorised by the certificate</tspan></text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 TWO KEYS (SVG) -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="eyebrow amber">Authority lives with the crew — not a committee</div>
+      <h2>Two keys to <span class="grad">launch</span>. One may be an agent.</h2>
+      <div class="svgwrap">
+        <svg viewBox="0 0 1020 320" role="img" aria-label="Two keys turned together authorise a promotion; one key may be an agent">
+          <defs><linearGradient id="go" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#10b981"/><stop offset="1" stop-color="#22d3ee"/></linearGradient></defs>
+          <!-- left actor: builder -->
+          <g transform="translate(150,150)"><circle r="34" fill="#0c1426" stroke="#818cf8" stroke-width="2"/><text class="s-fg" text-anchor="middle" dy="8" font-size="26">🧑‍💻</text>
+            <text class="s-mut" text-anchor="middle" y="64" font-size="13" font-weight="700">builder</text>
+            <text class="s-dim" text-anchor="middle" y="82" font-size="11">key 1</text></g>
+          <!-- key 1 -->
+          <g transform="translate(210,150)"><circle r="11" fill="none" stroke="#f59e0b" stroke-width="3"/><rect x="9" y="-3" width="60" height="6" rx="3" fill="#f59e0b"/><rect x="58" y="3" width="6" height="10" fill="#f59e0b"/></g>
+          <!-- console -->
+          <g transform="translate(430,96)"><rect width="160" height="120" rx="14" fill="#101a30" stroke="#3b4a73" stroke-width="2"/>
+            <circle cx="56" cy="60" r="13" fill="none" stroke="#6b7da0" stroke-width="2"/><circle cx="104" cy="60" r="13" fill="none" stroke="#6b7da0" stroke-width="2"/>
+            <text class="s-mut" x="80" y="30" text-anchor="middle" font-size="12" font-weight="800" letter-spacing="2">PROMOTE</text>
+            <text class="s-dim" x="80" y="104" text-anchor="middle" font-size="11">both, together</text></g>
+          <!-- key 2 -->
+          <g transform="translate(620,150) scale(-1,1)"><circle r="11" fill="none" stroke="#f59e0b" stroke-width="3"/><rect x="9" y="-3" width="60" height="6" rx="3" fill="#f59e0b"/><rect x="58" y="3" width="6" height="10" fill="#f59e0b"/></g>
+          <!-- right actor: human OR agent -->
+          <g transform="translate(700,150)"><circle r="34" fill="#0c1426" stroke="#22d3ee" stroke-width="2"/><text class="s-fg" text-anchor="middle" dy="8" font-size="24">🤖</text>
+            <text class="s-mut" text-anchor="middle" y="64" font-size="13" font-weight="700">2nd: human or agent</text>
+            <text class="s-dim" text-anchor="middle" y="82" font-size="11">key 2 · independent</text></g>
+          <!-- launch arrow -->
+          <path d="M760 150 H 940" stroke="url(#go)" stroke-width="4" marker-end="url(#ah)"/>
+          <defs><marker id="ah" markerWidth="12" markerHeight="12" refX="8" refY="6" orient="auto"><path d="M0 0 L10 6 L0 12 Z" fill="#10b981"/></marker></defs>
+          <text class="s-fg" x="905" y="138" text-anchor="middle" font-size="13" font-weight="800">launch</text>
+        </svg>
+      </div>
+      <p class="cap">Two qualified concurrences · <span class="em">at least one independent of the author</span> (no self-approval) ·
+        <span class="em">at most one an agent</span>. You only call shore when the action exceeds the crew’s envelope — the exception.</p>
+    </div>
+  </section>
+
+  <!-- 8 THE CAGE (SVG) -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="eyebrow">Why we can hand the crew the keys</div>
+      <h2>The <span class="grad">cage</span> licenses the freedom.</h2>
+      <div class="svgwrap">
+        <svg viewBox="0 0 1020 320" role="img" aria-label="A box with two hard walls — permissions and cost — with fast free movement inside">
+          <!-- outer box -->
+          <rect x="240" y="40" width="540" height="240" rx="16" fill="#0c1426" stroke="#22304d"/>
+          <!-- left wall: permissions -->
+          <rect x="240" y="40" width="26" height="240" rx="6" fill="#16223c" stroke="#4a5b86" stroke-width="2"/>
+          <text x="150" y="160" text-anchor="middle" font-size="13" font-weight="800" fill="#818cf8">PERMISSION<tspan x="150" dy="18">WALL</tspan></text>
+          <text x="150" y="208" text-anchor="middle" font-size="11" fill="#6b7da0">SCP tier —<tspan x="150" dy="15">binds every</tspan><tspan x="150" dy="15">principal</tspan></text>
+          <!-- right wall: cost -->
+          <rect x="754" y="40" width="26" height="240" rx="6" fill="#16223c" stroke="#7c5a1f" stroke-width="2"/>
+          <text x="880" y="160" text-anchor="middle" font-size="13" font-weight="800" fill="#f59e0b">COST<tspan x="880" dy="18">WALL</tspan></text>
+          <text x="880" y="208" text-anchor="middle" font-size="11" fill="#6b7da0">hard lease cap —<tspan x="880" dy="15">freeze, then</tspan><tspan x="880" dy="15">terminate</tspan></text>
+          <!-- free movement inside -->
+          <g stroke="#22d3ee" stroke-width="3" fill="none" opacity=".9" stroke-linecap="round">
+            <path d="M330 110 q60 -30 120 20 t120 -10" marker-end="url(#ah2)"/>
+            <path d="M560 220 q-70 30 -150 -10 t-30 -60" marker-end="url(#ah2)"/>
+          </g>
+          <defs><marker id="ah2" markerWidth="11" markerHeight="11" refX="7" refY="5.5" orient="auto"><path d="M0 0 L9 5.5 L0 11 Z" fill="#22d3ee"/></marker></defs>
+          <text x="510" y="170" text-anchor="middle" font-size="15" font-weight="800" fill="#eaf0fb">move fast</text>
+          <text x="510" y="192" text-anchor="middle" font-size="12" fill="#93a4c4">permissive · self-asserted · inner loop</text>
+        </svg>
+      </div>
+      <p class="cap">Crews get fast, two-key authority <span class="em">because the box is hard-walled</span> —
+        permissions by the SCP ratchet, money by the ISB lease cap. Neither key can blow out of it. <span class="dim">(Pre-prod isn’t disposable → advisory + FinOps.)</span></p>
+    </div>
+  </section>
+
+  <!-- 9 TRUST BUT VERIFY -->
+  <section class="slide">
+    <div class="wrap">
+      <div class="eyebrow">The safety underneath the speed</div>
       <h2>Trust, but verify — <span class="grad2">and revoke</span>.</h2>
       <div class="row" style="margin-top:8px">
         <div class="col card"><h3>Self-assert</h3><p>You move now. The assertion buys motion.</p></div>
@@ -250,61 +339,23 @@
         <div class="col card"><h3>Revoke on failure</h3><p>Evidence fails → the certificate is revoked, the unit freezes.</p></div>
       </div>
       <p class="sub" style="font-size:20px;color:var(--fg)">The durable state is always <span class="grad">evidence, not opinion.</span>
-        Self-assertion only changes <i>when</i> the check falls — never <i>whether</i> proof is required.</p>
+        Self-assertion changes <i>when</i> the check falls — never <i>whether</i> proof is required.</p>
     </div>
   </section>
 
-  <!-- 9b -->
-  <section class="slide">
-    <div class="wrap">
-      <div class="eyebrow">Why we can trust the crew with the keys</div>
-      <h2>The <span class="grad">cage</span> licenses the freedom.</h2>
-      <p class="lede wide">A crew gets fast, two-key authority <span class="em">because it works inside a box it cannot blow out of.</span>
-        Both walls are structural — not paperwork.</p>
-      <div class="row" style="margin-top:8px">
-        <div class="col card"><span class="tag">Permission wall</span>
-          <h3 style="margin-top:12px">Conformance is structural</h3>
-          <p>Each stage tightens the account’s <b>guardrails (SCPs)</b> — preventive, binding <i>every</i> principal,
-            including a credentialed agent. The certificate authorises the click up; you never silently loosen.</p></div>
-        <div class="col card"><span class="tag">Money wall</span>
-          <h3 style="margin-top:12px">Cost caps are hard — sandbox side</h3>
-          <p>Every lease has a <b>hard budget</b>. Breach it and the sandbox <b>freezes, then recycles</b> — neither key
-            can spend past the cap. <span class="dim">Pre-prod isn’t disposable, so there it’s advisory + your FinOps process.</span></p></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 10 -->
-  <section class="slide">
-    <div class="wrap">
-      <div class="eyebrow">What actually ramps</div>
-      <h2>Four stages. Conformance rises with maturity.</h2>
-      <div class="ladder">
-        <div class="rung"><div class="st">S0 · Explore</div><h4>Falsify the idea</h4>
-          <div class="k"><b>Any</b> model · hard $ cap</div><div class="k">Permissive; code deploy</div><div class="k">Checks advisory</div></div>
-        <div class="rung"><div class="st">S1 · Incubate</div><h4>Make it real</h4>
-          <div class="k"><b>Pinned</b> model · hard $ cap</div><div class="k">Signed image (digest)</div><div class="k">Contracts + replay block</div></div>
-        <div class="rung"><div class="st">S2 · Harden</div><h4>Make it attestable</h4>
-          <div class="k"><b>Allowlist</b> + provenance</div><div class="k">Eval thresholds gate</div><div class="k">Preventive SCP tier</div></div>
-        <div class="rung g3"><div class="st">S3 · Pre-prod</div><h4>Make it operable</h4>
-          <div class="k"><b>Attested</b> model + params</div><div class="k">Same digest redeployed</div><div class="k">Governed acct · FinOps</div></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 11 -->
+  <!-- 10 CERTIFICATE -->
   <section class="slide">
     <div class="wrap">
       <div class="eyebrow">For the CISO — provably governed</div>
-      <h2>Every step issues a <span class="grad">certificate</span>. Published.</h2>
-      <p class="lede wide">A signed, human-readable passport per unit: which stage, what evidence,
-        which approvers, which verifying release. A <span class="em">passport, not a logfile.</span></p>
-      <p class="sub">Standing is visible on the docs site — a regulator or auditor reads a unit’s attestation trail
-        without access to a single pipeline, and without a meeting.</p>
+      <h2>Every step issues a <span class="grad">passport</span>. Published.</h2>
+      <p class="lede wide">A signed, human-readable certificate per unit: stage, evidence, adjudication, approvers,
+        the verifying release. <span class="em">A passport, not a logfile.</span></p>
+      <p class="sub">Standing is visible on the docs site — an auditor reads a unit’s attestation trail without touching a
+        pipeline, and without a meeting.</p>
     </div>
   </section>
 
-  <!-- 12 -->
+  <!-- 11 WHAT WE BUILT -->
   <section class="slide">
     <div class="wrap">
       <div class="eyebrow">What we built</div>
@@ -317,45 +368,42 @@
     </div>
   </section>
 
-  <!-- 13 -->
+  <!-- 12 ASK -->
   <section class="slide">
     <div class="wrap">
       <div class="eyebrow">The ask</div>
       <h2>Acceleration with a paper trail.</h2>
       <ul class="clean">
-        <li><span class="num">①</span><div><b>Delegated SCP scope</b> over the sandbox OU subtree — so conformance becomes <i>preventive</i>, landed before first Harden. <span class="dim">(Not whole-org. Ever.)</span></div></li>
-        <li><span class="num">②</span><div><b>Bless three spikes</b> — harvest hold, pipeline-vended lease, one verified promotion. Named risks, each with a fallback.</div></li>
-        <li><span class="num">③</span><div><b>One business unit to go first.</b> Minutes to sandbox; a day to onboard.</div></li>
+        <li><span class="num">①</span><div><b>Delegated SCP scope</b> over the sandbox subtree — so conformance is <i>preventive</i>, landed before first Harden. <span class="dim">(Not whole-org. Ever.)</span></div></li>
+        <li><span class="num">②</span><div><b>Bless four spikes</b> — harvest hold, pipeline-vended lease, one verified promotion, the SCP ratchet vs. drift. Named risks, each with a fallback.</div></li>
+        <li><span class="num">③</span><div><b>One crew to go first.</b> Minutes to sandbox; a day to onboard.</div></li>
       </ul>
     </div>
   </section>
 
-  <!-- 14 -->
-  <section class="slide">
+  <!-- 13 CLOSE -->
+  <section class="slide sunny">
     <div class="wrap">
-      <div class="eyebrow">In one breath</div>
+      <div class="eyebrow amber">In one breath</div>
       <p class="final">A sandbox where <span class="grad">nothing is trusted and everything is permitted</span>,
-        graduating — one self-asserted, evidence-stamped step at a time, with an agent watching for risk and cost —
+        graduating — one self-asserted, two-key, evidence-stamped step at a time, inside a box it can’t blow out of —
         into an estate where <span class="grad2">nothing is permitted except what’s attested.</span></p>
-      <p class="sub" style="letter-spacing:.28em;text-transform:uppercase">Causeway · fast access, progressive conformance</p>
+      <p class="sub" style="letter-spacing:.28em;text-transform:uppercase">Causeway · the sunny day, earned</p>
     </div>
   </section>
 
 </div>
-
 <script>
-  const deck=document.getElementById('deck'), bar=document.getElementById('bar'), count=document.getElementById('count');
+  const deck=document.getElementById('deck'),bar=document.getElementById('bar'),count=document.getElementById('count');
   const slides=[...document.querySelectorAll('.slide')];
-  function current(){return Math.round(deck.scrollTop/window.innerHeight);}
-  function go(i){i=Math.max(0,Math.min(slides.length-1,i));slides[i].scrollIntoView();}
-  function update(){const i=current();const p=slides.length>1?i/(slides.length-1):0;
-    bar.style.width=(p*100)+'%';count.textContent=String(i+1).padStart(2,'0')+' / '+String(slides.length).padStart(2,'0');}
+  const cur=()=>Math.round(deck.scrollTop/window.innerHeight);
+  const go=i=>{i=Math.max(0,Math.min(slides.length-1,i));slides[i].scrollIntoView();};
+  function update(){const i=cur();const p=slides.length>1?i/(slides.length-1):0;bar.style.width=(p*100)+'%';
+    count.textContent=String(i+1).padStart(2,'0')+' / '+String(slides.length).padStart(2,'0');}
   deck.addEventListener('scroll',()=>requestAnimationFrame(update),{passive:true});
-  addEventListener('keydown',e=>{
-    if(['ArrowRight','ArrowDown','PageDown',' '].includes(e.key)){e.preventDefault();go(current()+1);}
-    if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){e.preventDefault();go(current()-1);}
-    if(e.key==='Home'){go(0);} if(e.key==='End'){go(slides.length-1);}
-  });
+  addEventListener('keydown',e=>{if(['ArrowRight','ArrowDown','PageDown',' '].includes(e.key)){e.preventDefault();go(cur()+1);}
+    if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){e.preventDefault();go(cur()-1);}
+    if(e.key==='Home')go(0);if(e.key==='End')go(slides.length-1);});
   update();
 </script>
 </body>

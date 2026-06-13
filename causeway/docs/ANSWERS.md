@@ -128,3 +128,10 @@ multiple-choice rounds with delegation allowed ("you decide → recommendation l
 | O2 | Permanent naming ("Causeway", stage names)? | Working titles stand |
 | O3 | Split SPEC.md into linked section files at v1.0? | Keep monolithic + comms on-ramp |
 | O4 | Crew qualification model — who grants/revokes a crew's risk/cost envelope? | Platform team grants; attestation history + adjudicator govern |
+
+## Round 14 — visual deck + independence erratum (2026-06-13)
+
+| Q | Question | Answer | → |
+|---|---|---|---|
+| 34 | "Make the slides land concepts visually — best media (SVG / C4 / mermaid); start with the sunny day in August then the journey" | Deck rebuilt **sunny-day-first**: vignette + a rising **journey timeline**, then the journey via **six inline SVGs** (wall, wall→ramp, the ratchet, two-key launch, the cage, journey). **Inline SVG chosen** over mermaid/C4 — fully self-contained (mermaid needs a bundled renderer; SVG renders anywhere and is on-brand). Talk-track v2 | (deliverable) |
+| 35 | (erratum) two-key independence was self-contradictory ("neither key is the author" vs builder asserts) | Corrected to the coherent rule in §2.5/ADR-0024/D29 and the SVG: **two concurrences, ≥1 independent of the author (no self-approval; both for top classes), ≤1 an agent** | D29, ADR-0024 (erratum) |

@@ -18,7 +18,8 @@ returns `two-keys-required`, the control is the **two-person rule**:
   **inside the crew's delegated envelope**.
 - **At most one key may be an agent** (never two — the human floor). An attesting agent
   (e.g. the adjudicator) may hold the second key when it has standing for the class.
-- **Neither key is the author** of the change (independence; no self-concurrence).
+- **At least one concurrence is independent of the author** (no self-approval; for the
+  highest classes, both keys must be non-authors).
 - **Out-of-band escalation is the exception**, firing only when the action **exceeds the
   crew's qualified envelope** — a class they don't hold, or cost beyond their authority
   (and the cost ceiling is itself structurally capped, ADR-0026).

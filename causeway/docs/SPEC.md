@@ -56,7 +56,7 @@ innovation and pre-prod.
 | D26 | Risk/cost adjudicator | A fail-safe, monotonic **adjudicator skill** classifies risk + commercial/cost per change; trip-wire packs are authoritative, reasoning is additive-only, ambiguity escalates; its verdict is itself evidence ([skill spec](../.kiro/specs/risk-cost-adjudicator/requirements.md), ADR-0021) |
 | D27 | Attestation certificates | Each stage transition issues a signed, human-readable **certificate** (evidence + adjudication + approvers + verifying release), **published to the docs site** as the unit's stamped passport; revocation is append-only (§9.3, ADR-0022) |
 | D28 | Portability seam | **GitLab-centric by choice, not by trap**: manifests, certificates, and adjudicator verdicts are tool-neutral data; GitLab approval rules / Pages / catalog are the current binding. No portability abstraction tax paid in v1 (ADR-0023) |
-| D29 | Delegated crews + two-person rule | Authority **reverts to qualified crews**; elevation is satisfied by the **two-person (launch-code) rule** — two authorized actors concur, **≤ one may be an agent**, neither is the author, both inside the crew's envelope. **Out-of-band escalation only when beyond the crew's qualified envelope** (corrects the original out-of-band routing) (§2.5, ADR-0024) |
+| D29 | Delegated crews + two-person rule | Authority **reverts to qualified crews**; elevation is satisfied by the **two-person (launch-code) rule** — two authorized actors concur, **≤ one may be an agent**, **≥ one independent of the author** (no self-approval), both inside the crew's envelope. **Out-of-band escalation only when beyond the crew's qualified envelope** (corrects the original out-of-band routing) (§2.5, ADR-0024) |
 | D30 | Progressive-conformance SCP ratchet | Stages are **additive SCP tiers** (`S0⊂S1⊂S2`); because ISB OUs are lifecycle and drift-quarantines moves, the tier is realised as **account-level SCPs while the account stays in `Active`** (not stage-OU moves). Promotion **attaches the next tier, authorized by the certificate**, monotonic, per-lease (detached on recycle). Pipeline→evidence; certificate→authorizes; SCP→enforces. Primary; pipeline-only is fallback. Spike S0-4 (§3.1, §4.5, ADR-0025) |
 | D31 | Cost caps: hard in sandbox, advisory in pre-prod | **S0–S2: hard** = ISB `maxSpend`/Cost-Explorer tracking + native `ALERT`/`FREEZE_ACCOUNT` **plus Causeway-driven `terminate` at the ceiling** (ISB has no native terminate-at-threshold; freeze≠spend-stop; Cost-Explorer latency→headroom). Bounds crew blast radius by construction; not self-assertable. **S3: advisory + org FinOps** (§3.1, §4.5, ADR-0026) |
 
@@ -253,8 +253,9 @@ Three moving parts make this safe rather than merely fast:
    risk/cost class). When the adjudicator returns `two-keys-required`, the control is the
    **launch-code rule**: *two authorized actors concur*, and **one of the two may be an
    agent** — but never both (the safety invariant is *at most one agent key*). Both keys
-   come from **inside the crew's delegated envelope**; neither key may be the author of
-   the change (independence). The adjudicator may itself hold the second key when it has
+   come from **inside the crew's delegated envelope**; **at least one concurrence must be
+   independent of the author** (no self-approval — for the highest classes, both). The
+   adjudicator may itself hold the second key when it has
    standing for that class and did not author the change. **Out-of-band escalation is the
    exception, not the rule**: it fires only when the action *exceeds the crew's qualified
    envelope* (a risk class they don't hold, or cost beyond their authority — and even then
