@@ -1,8 +1,16 @@
 # The Graduated Innovation Stage ("Causeway")
 
+**Spec v0.12 — 2026-06-13 — status: design-on-known-behaviour discipline — spikes reclassified
+as confirm/calibrate not design-blockers (D33, ADR-0028); harvest redesigned continuous, removing
+the cleanup-hold dependency (D34, ADR-0029). Prior headers retained.**
+
+**Spec v0.11 — 2026-06-13 — status: cost-cap honesty — budget is a lagging backstop, the
+real-time ceiling is preventive (D32, ADR-0027 supersedes ADR-0026's 'hard by construction');
+boundary clarified (this spec is not ISB). Prior headers retained for history.**
+
 **Spec v0.10 — 2026-06-13 — status: authority delegated to qualified crews (two-person rule),
 conformance made structural (OU ratchet), cost caps hard-in-sandbox/advisory-in-pre-prod
-(D29–D31, ADR-0024–0026). Superseded header below retained for history.**
+(D29–D31, ADR-0024–0026).**
 
 **Spec v0.9 — 2026-06-13 — status: self-asserted trust-but-verify governance + attestation
 certificates + portability seam (D25–D28, ADR-0020–0023); comms artifacts added
@@ -21,6 +29,13 @@ innovation and pre-prod.
 > evaluators/replay/Cedar-tool gates, the model-governance ladder, the AgentCore-native
 > observability feeding evidence — is shaped by that workload. Read everything below as
 > "for building agents", not "for arbitrary infrastructure".
+
+> **Boundary — this spec is *not* ISB.** Innovation Sandbox on AWS is AWS's product, with
+> its own source and spec; Causeway neither owns nor re-specifies it. This document specs
+> the **thin extension** that consumes ISB via its API and events (ADR-0001). Where a
+> capability is ISB's (leases, budgets, OUs, Nuke) vs. Causeway's (stages, evidence,
+> certificates, two-key, the SCP ratchet, the terminate automation), the **coherence map
+> §4.5** says so line by line.
 
 ---
 
@@ -58,7 +73,10 @@ innovation and pre-prod.
 | D28 | Portability seam | **GitLab-centric by choice, not by trap**: manifests, certificates, and adjudicator verdicts are tool-neutral data; GitLab approval rules / Pages / catalog are the current binding. No portability abstraction tax paid in v1 (ADR-0023) |
 | D29 | Delegated crews + two-person rule | Authority **reverts to qualified crews**; elevation is satisfied by the **two-person (launch-code) rule** — two authorized actors concur, **≤ one may be an agent**, **≥ one independent of the author** (no self-approval), both inside the crew's envelope. **Out-of-band escalation only when beyond the crew's qualified envelope** (corrects the original out-of-band routing) (§2.5, ADR-0024) |
 | D30 | Progressive-conformance SCP ratchet | Stages are **additive SCP tiers** (`S0⊂S1⊂S2`); because ISB OUs are lifecycle and drift-quarantines moves, the tier is realised as **account-level SCPs while the account stays in `Active`** (not stage-OU moves). Promotion **attaches the next tier, authorized by the certificate**, monotonic, per-lease (detached on recycle). Pipeline→evidence; certificate→authorizes; SCP→enforces. Primary; pipeline-only is fallback. Spike S0-4 (§3.1, §4.5, ADR-0025) |
-| D31 | Cost caps: hard in sandbox, advisory in pre-prod | **S0–S2: hard** = ISB `maxSpend`/Cost-Explorer tracking + native `ALERT`/`FREEZE_ACCOUNT` **plus Causeway-driven `terminate` at the ceiling** (ISB has no native terminate-at-threshold; freeze≠spend-stop; Cost-Explorer latency→headroom). Bounds crew blast radius by construction; not self-assertable. **S3: advisory + org FinOps** (§3.1, §4.5, ADR-0026) |
+| D34 | Continuous harvest | Harvest is **continuous** (every push streams digest/baselines/lineage/evidence to GitLab) + a deadline-bounded **final flush at `durationThresholds`**; removes the unverified cleanup-hold dependency. Bounded-wait discipline holds (§4.4, ADR-0029) |
+| D33 | Design on known behaviour | **Spikes confirm/calibrate, never block.** Design every answer from validated behaviour (§4.5) first; a spike is justified only for a narrow external unknown or a magnitude to calibrate, and must state the designed answer + fallback (SPIKES.md, ADR-0028) |
+| D32 | Cost caps really work? | The ISB budget cap is a **lagging, detective backstop** (Cost-Explorer lag; freeze≠stop; terminate/nuke takes time) bounding spend to `maxSpend`+overshoot. The **real-time hard ceiling is preventive**: SCP-denied expensive vectors + Bedrock/AgentCore token & rate caps. Keep budgets small. Defence in depth; Spike S0-5 (§3.1, ADR-0027 supersedes ADR-0026's 'hard by construction') |
+| D31 | Cost caps: hard in sandbox, advisory in pre-prod | **S0–S2: hard** = ISB `maxSpend`/Cost-Explorer tracking + native `ALERT`/`FREEZE_ACCOUNT` **plus Causeway-driven `terminate` at the ceiling** (ISB has no native terminate-at-threshold; freeze≠spend-stop; Cost-Explorer latency→headroom). Bounds crew blast radius by construction; not self-assertable. **S3: advisory + org FinOps** (§3.1, §4.5, ADR-0026). **Honesty (D32/ADR-0027): budget = lagging backstop; real-time cap is preventive (SCP + AgentCore token/rate caps).** |
 
 ---
 
@@ -359,6 +377,16 @@ precisely between ISB and Causeway, because ISB's native budget actions are limi
   spend past the ceiling, because the control plane terminates the lease. The adjudicator
   governs within-cap cost *trajectory* (routing elevation to crew two-key concurrence); the
   hard ceiling is structural and not self-assertable.
+
+- **Honesty (ADR-0027): the budget cap is a *lagging backstop*, not a real-time ceiling.**
+  Cost Explorer lags hours, freeze doesn't stop running spend, and terminate→nuke takes
+  time — so the budget alone bounds spend only to `maxSpend` + overshoot
+  (`overshoot ≈ (cost-data latency + freeze→terminate→nuke) × burn rate`). The **real-time
+  hard limit is preventive**: the **SCP tier denies expensive vectors up front** (instance
+  types, services, regions, concurrency) and **Bedrock/AgentCore caps** bound the token
+  vector (max tokens, inference-profile budgets, Gateway rate limits, Runtime timeouts).
+  Keep `maxSpend` small so absolute overshoot stays small. Defence in depth: preventive
+  (real-time) + budget backstop (lagging) + harvest-then-nuke. Measured by Spike S0-5.
 - **S3 (pre-prod, governed account): advisory + FinOps.** Once the workload leaves the
   pool it is no longer disposable; a hard freeze would be a self-inflicted outage.
   There, cost governance reverts to the organization's **existing FinOps process** —
@@ -417,19 +445,27 @@ which ISB structures for customisation and which the CCoE owns anyway).
 (S0/S1/S2 = the leased account; S3 = governed account). Promotion edits exactly one
 file, by pipeline, with the change itself part of the evidence trail.
 
-### 4.4 Harvest then nuke (D8)
+### 4.4 Harvest then nuke — continuous, not a pre-cleanup batch (D8, D34, ADR-0029)
 
-On lease end without graduation, the harvest pipeline runs **before** cleanup:
+The earlier design made harvest a big batch *before* cleanup, needing ISB to **hold**
+cleanup until we finished — an unverified dependency. That over-engineered a problem our
+own design already solves, and is corrected: **the valuable state is produced as evidence
+and pushed to GitLab continuously**, so at cleanup time almost nothing lives only in the
+account.
 
-1. Freeze the lease via API (stops spend during harvest).
-2. Verify repo == account: IaC plan against live account; drift is *recorded*, not fixed.
-3. Push final OCI image / code bundle to the GitLab registry (digest recorded).
-4. Export eval baselines and `traces` excerpts. (AgentCore **Memory** store export is
-   deferred to v2 per D13 — v2 trigger is the first park-and-revive demand.)
-5. Write the **experiment record** (AI-DLC inception/elaboration artefacts + outcome +
-   decision: park / kill / revive) to the BU's catalog area.
-6. Signal the control project → cleanup proceeds → account recycles. Nothing of value dies
-   with the account; the account stays disposable.
+- **Continuous harvest (steady state).** Every push/build already streams the OCI image
+  digest, eval baselines, lineage and evidence to GitLab (the evidence model, §9); the
+  experiment record accretes the same way. The repo is, at all times, a near-complete
+  harvest. By design, what lives *only* in the disposable account is minimal.
+- **Final flush at the known `durationThresholds` event.** That ISB pre-expiry signal is a
+  *validated* feature; on it the control project flushes the last delta (final digest,
+  baseline, drift report, experiment-record close-out) and marks park/kill/revive.
+  Deadline-bounded — the halting discipline holds.
+- **At `CleanAccountRequest`/cleanup there is nothing critical to hold for** — no dependency
+  on an unverified cleanup-hold. If the threshold lead time is ever short, the continuous
+  stream already holds all but the last delta; the failure mode is a *small, recorded* gap,
+  not lost work. AgentCore **Memory** export stays deferred to v2 (D13); repo↔account drift
+  is recorded, not fixed.
 
 ### 4.5 ISB coherence map — every Causeway mechanism against a *validated* ISB feature
 
@@ -840,7 +876,25 @@ target?"):
 21. **Cost caps**: hard and ISB-enforced in the sandbox (ceiling→terminate); advisory +
     FinOps in pre-prod (D31, ADR-0026). Deck + comms updated to promote crew delegation.
 
-**Remaining for v0.11:**
+**Resolved in v0.11** (2026-06-13, "do the cost caps really work?" + "the spec is the ISB?"):
+
+22. Cost-cap honesty: the ISB budget is a **lagging, detective backstop** (Cost-Explorer
+    lag; freeze≠spend-stop; terminate/nuke takes time); the **real-time hard ceiling is
+    preventive** (SCP-denied vectors + Bedrock/AgentCore token & rate caps); budgets kept
+    small. Defence in depth; Spike S0-5; ADR-0027 supersedes ADR-0026's "hard by
+    construction" (D32). Deck + PRFAQ softened to match.
+23. Boundary clarified: **this spec is the thin extension, not ISB** (intro + §4.5 map).
+
+**Resolved in v0.12** (2026-06-13, "too much designable-from-known-behaviour is being deferred to spikes"):
+
+24. Discipline: **design from validated behaviour first; spikes confirm or calibrate, never
+    block** (D33, ADR-0028). Spike register reclassified (SPIKES.md): designed-now vs
+    confirm vs calibrate, each stating its designed answer + fallback.
+25. **Harvest redesigned continuous** (D34, ADR-0029): every push streams evidence to GitLab,
+    final flush at the validated `durationThresholds` event — removes the unverified
+    cleanup-hold dependency (old S0-1 demoted to a non-blocking confirmation).
+
+**Remaining for v0.13:**
 
 1. Who arbitrates the catalog contribution path (E9) — platform team only, or trusted BU
    maintainers with platform review? (Default until decided: platform team only.)

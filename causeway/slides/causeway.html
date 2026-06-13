@@ -94,7 +94,7 @@
       </div>
       <div class="col" style="flex:.9 1 320px">
         <div class="card"><h3>And yet — all of it was governed</h3>
-          <p>Spend hard-capped. Guardrails tightened at each step, binding even her agent. Every promotion signed and
+          <p>Spend bounded (preventive caps + budget backstop). Guardrails tightened at each step, binding even her agent. Every promotion signed and
             evidenced. The CISO can read its standing without a meeting. <span class="dim">Speed and control, at the same time.</span></p></div>
         <p class="cap" style="text-align:left;margin-top:18px">This is the “sunny day”. The rest of the deck is the journey that earns it —
           and quietly handles the rainy days too (revoke, freeze, quarantine).</p>
@@ -338,7 +338,7 @@ flowchart LR
           <!-- right wall: cost -->
           <rect x="754" y="40" width="26" height="240" rx="6" fill="#16223c" stroke="#7c5a1f" stroke-width="2"/>
           <text x="880" y="160" text-anchor="middle" font-size="13" font-weight="800" fill="#f59e0b">COST<tspan x="880" dy="18">WALL</tspan></text>
-          <text x="880" y="208" text-anchor="middle" font-size="11" fill="#6b7da0">hard lease cap —<tspan x="880" dy="15">freeze, then</tspan><tspan x="880" dy="15">terminate</tspan></text>
+          <text x="880" y="200" text-anchor="middle" font-size="11" fill="#6b7da0">limit spend<tspan x="880" dy="15">up front +</tspan><tspan x="880" dy="15">budget backstop</tspan></text>
           <!-- free movement inside -->
           <g stroke="#22d3ee" stroke-width="3" fill="none" opacity=".9" stroke-linecap="round">
             <path d="M330 110 q60 -30 120 20 t120 -10" marker-end="url(#ah2)"/>
@@ -349,8 +349,8 @@ flowchart LR
           <text x="510" y="192" text-anchor="middle" font-size="12" fill="#93a4c4">permissive · self-asserted · inner loop</text>
         </svg>
       </div>
-      <p class="cap">Crews get fast, two-key authority <span class="em">because the box is hard-walled</span> —
-        permissions by the SCP ratchet, money by the ISB lease cap. Neither key can blow out of it. <span class="dim">(Pre-prod isn’t disposable → advisory + FinOps.)</span></p>
+      <p class="cap">Crews get fast, two-key authority <span class="em">because the box is walled</span> — you can only spend on what the
+        SCP tier and token/rate caps allow, and a small lease budget backstops the rest. Blast radius stays bounded. <span class="dim">(Pre-prod → advisory + FinOps.)</span></p>
     </div>
   </section>
 

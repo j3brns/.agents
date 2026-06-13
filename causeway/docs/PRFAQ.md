@@ -99,12 +99,15 @@ your visible, recurring decision rather than our silent default.
 ### For finance / the budget owner
 
 **Q: How is cost controlled, and who watches commercial exposure?**
-Two regimes, split at the pool boundary. **In the sandbox (S0–S2)** every lease carries a
-**hard budget enforced by Innovation Sandbox itself**: breach a threshold and the account
-freezes; at the ceiling our control plane terminates and recycles it. Because freezing
-alone doesn't stop already-running resources, the *ceiling* action is termination, and
-thresholds sit below the true cap to absorb billing latency — so a self-asserting crew's
-spend is bounded by construction. **In pre-prod (S3)** the workload isn't disposable, so a
+Defence in depth, and we're honest about each layer. The **real-time** limit is
+**preventive**: in the sandbox the account's SCP tier denies the expensive vectors up front
+(instance types, costly services, regions) and Bedrock/AgentCore caps bound token spend and
+tool-call rates — you can't overspend on what you can't launch. Behind that, the **ISB lease
+budget is a lagging backstop**: it tracks spend (with cost-data latency), freezes, and at the
+ceiling our control plane terminates and recycles. Budgets are kept small per stage so the
+*absolute* overshoot is small. So spend is **bounded by construction** — by the preventive
+layer in real time, with the budget as the catch-all — not capped to the cent in real time,
+which no cloud budget alarm can promise. **In pre-prod (S3)** the workload isn't disposable, so a
 kill-switch would be an outage: cost reverts to your **existing FinOps process** (budgets,
 anomaly detection, showback/chargeback), with Causeway feeding advisory cost evidence.
 Separately, the adjudicator treats within-cap cost *elevation* as a trigger for crew

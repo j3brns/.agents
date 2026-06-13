@@ -1,69 +1,67 @@
-# Spike 0 — assumptions that must become facts
+# Spikes — confirmations & calibrations, not design-blockers
 
-Three one-week spikes convert the spec's riskiest assumptions into facts **before any
-roadmap commitment**. Each has a falsifiable claim, an experiment, and a fallback design
-so a negative result changes the spec instead of killing it. Results are appended here
-and linked from the governing ADR (per [`REFINEMENT.md`](REFINEMENT.md) step 5).
+**Discipline (ADR-0028): design the answer from validated behaviour first; spike only to
+*confirm* a narrow external unknown or *calibrate* a magnitude.** Every entry states the
+**designed answer** it is checking, its known-behaviour basis (see the coherence map,
+[`SPEC.md` §4.5](SPEC.md)), and the fallback. None of these blocks the build — the roadmap
+proceeds on the designed answers while these run in parallel.
 
-## S0-1 · The harvest hold (governs ADR-0008) — **highest risk**
+## Classification
 
-- **Claim**: stock ISB can be made to delay account cleanup behind an external,
-  deadline-bounded signal (or an equivalent pre-cleanup hook exists).
-- **Experiment**: deploy ISB in a test org; end a lease; trace
-  `CleanAccountRequest` → Step Functions → CodeBuild timing; attempt (a) an EventBridge
-  rule that gates the state machine, (b) a wait-state contribution point upstream,
-  (c) measuring the natural gap between event and Nuke start.
-- **Pass**: a supported hold ≥ harvest deadline without forking ISB.
-- **Fallback if failed**: harvest fires at the *duration-threshold alert* (pre-expiry,
-  ISB-native), accepting a race window; ADR-0008 superseded accordingly; upstream
-  feature request filed.
+| # | Kind | Designed answer (proceeds now) | What the spike adds |
+|---|---|---|---|
+| S0-1 | Confirm (non-blocking) | **Harvest is continuous** (ADR-0029) → no cleanup-hold needed | that `durationThresholds` gives enough lead for the final flush |
+| S0-2 | Confirm | A **dedicated IdC automation identity** calls the lease API; blueprint carries the OIDC trust role | the exact supported principal type for ISB's API auth |
+| S0-3 | Build-acceptance | Verifier **reproducibility is our design** (pinned versions, hashed inputs) | a regression test on our own code — not an external unknown |
+| S0-4 | Confirm (narrow) | **Account-level SCP ratchet**, account stays in `Active` — orthogonal to ISB's OU-based drift (ADR-0025) | that ISB drift doesn't *also* watch account-SCP attachments (expected: it doesn't) |
+| S0-5 | Calibrate | Preventive caps (SCP service/instance denials + AgentCore token/rate caps) hold the real-time line (ADR-0027) | the **magnitude** of budget overshoot at the S0 cap; tune the caps |
 
-## S0-2 · Pipeline-driven lease + OIDC bootstrap (governs ADR-0004, ADR-0013)
+---
 
-- **Claim**: a GitLab pipeline can request an ISB lease via the REST API, the blueprint
-  deploys the OIDC trust role, and a runner job then assumes that role in the leased
-  account — end to end, no human, no stored keys.
-- **Experiment**: minimal control-project pipeline → `POST /leases` → poll →
-  blueprint-deployed role → OIDC `aws sts assume-role-with-web-identity` → deploy a
-  hello-world via `agentcore deploy`.
-- **Pass**: green pipeline from issue-form trigger to agent invocation in the sandbox.
-- **Fallback if failed**: identify which link broke (ISB auth model for API callers is
-  the likely suspect — it expects IAM Identity Center users); design a service-account
-  pattern or scoped token broker; supersede affected ADR.
+## S0-1 · Final-flush lead time (confirms ADR-0029) — non-blocking
+- **Designed answer**: harvest is continuous; the repo is a near-complete harvest at all
+  times, so cleanup needs no hold. Known basis: we own the evidence pipeline (§9).
+- **Confirm**: ISB's `durationThresholds` pre-expiry event fires with enough lead for a
+  deadline-bounded final flush. **Fallback**: shorten the flush; accept a small recorded gap.
 
-## S0-3 · One promotion through the verifier (governs ADR-0005, -0006, -0010, -0012)
+## S0-2 · Pipeline-vended lease + OIDC (confirms ADR-0004/0013)
+- **Designed answer**: a dedicated IAM Identity Center **automation identity** calls
+  `POST /leases`; the stage blueprint deploys the OIDC trust role the runner then assumes —
+  no stored keys. Known basis: `/leases` + blueprint provisioning are validated (§4.5).
+- **Confirm**: ISB's API accepts an automation/service principal (not only interactive IdC
+  users). **Fallback**: a scoped token broker in front of the lease API.
 
-- **Claim**: a digest-pinned, cosign/KMS-signed image with SLSA-L1 provenance, a
-  policy-assertion-report, and a replay verdict can be assembled into a machine-written
-  manifest and deterministically verified by a CLI in a promotion MR — twice, with
-  identical verdicts.
-- **Experiment**: hand-rolled minimal catalog (pipeline component + verifier CLI stub)
-  promoting the S0-2 hello-world from explore→incubate.
-- **Pass**: verifier verdict reproducible from the manifest alone on a clean runner.
-- **Fallback if failed**: usually a non-reproducible evidence item — pin it or drop it
-  from the v1 ledger; record in ADR.
+## S0-3 · One promotion verifies reproducibly (build-acceptance, our design)
+- **Designed answer**: the verifier is deterministic by construction — pinned component/
+  policy/model versions, hashed inputs, machine-written manifest. Reproducibility is a
+  property we **build and test**, not an ISB unknown.
+- **Acceptance**: same manifest → identical verdict on a clean runner, twice. **Fallback**:
+  pin or drop any non-reproducible evidence item.
 
-## S0-4 · The OU ratchet vs. ISB drift (governs ADR-0025) — **new in v0.10**
+## S0-4 · Account-level SCPs vs ISB drift (confirms ADR-0025) — narrow
+- **Designed answer**: stages are **account-level SCP tiers** while the account stays in
+  ISB's `Active` OU — no OU move, so ISB's **OU-based** drift detection (validated, §4.5)
+  has nothing to flag; ISB does not manage account-level SCPs, so it won't revert them.
+  This is the designed **primary** mechanism, not a contingency.
+- **Confirm**: ISB drift doesn't *additionally* inspect account-SCP attachments (expected:
+  no). **Fallback ladder**: true stage-OUs only if CCoE extends ISB's expected-OU config →
+  pipeline-only (degraded).
 
-- **Claim**: a delegated actor can express per-lease progressive conformance by **attaching
-  account-level SCPs to a pooled account while it stays in ISB's `Active` OU** (primary —
-  no OU move, so no drift trip), and ISB **CleanUp detaches them on recycle**. Secondary:
-  whether true stage-OUs are viable at all given ISB drift-quarantine.
-- **Experiment**: in the S0-1 test org, with delegated SCP admin: **(primary)** lease an
-  account, attach S1 then S2 account-level SCPs while it stays in `Active`, confirm no
-  drift→quarantine and that the SCPs bind; end the lease and confirm CleanUp detaches them
-  (next lease starts at S0). **(secondary)** attempt a sibling-OU move and observe whether
-  drift quarantines it, to confirm the constraint that forced the account-level approach.
-- **Pass**: account-level SCP tiers survive a full S0→S2→recycle cycle without quarantine,
-  bind every principal, and detach on recycle.
-- **Fallback if both fail**: pipeline-only detective enforcement (today's degraded
-  posture, ADR-0015); supersede ADR-0025's "primary enforcement" claim accordingly.
+## S0-5 · Cost overshoot magnitude (calibrates ADR-0027)
+- **Designed answer**: the real-time cap is **preventive** — SCP-deny expensive instance
+  types/services/regions + AgentCore max-tokens/inference-profile budgets/Gateway rate
+  limits/Runtime timeouts; the small ISB lease budget is the lagging backstop.
+- **Calibrate**: deliberately burn a small lease (benign resource + Bedrock token loop);
+  record **$ over `maxSpend`** at terminate and the preventive denials' effect; tune caps
+  and budget so absolute overshoot is acceptable. **Fallback**: tighten the preventive
+  layer; never lean on the budget as the primary control.
 
 ## Results
 
-| Spike | Date | Verdict | Notes / ADR action |
+| Spike | Date | Verdict | Notes |
 |---|---|---|---|
-| S0-1 | — | pending | |
-| S0-2 | — | pending | |
-| S0-3 | — | pending | |
-| S0-4 | — | pending | OU ratchet vs ISB drift (ADR-0025) |
+| S0-1 | — | pending (non-blocking) | final-flush lead time |
+| S0-2 | — | pending | ISB API auth for automation principal |
+| S0-3 | — | pending (build-acceptance) | verifier determinism |
+| S0-4 | — | pending (narrow) | account-SCPs vs OU drift |
+| S0-5 | — | pending (calibration) | cost overshoot + preventive caps |

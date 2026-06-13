@@ -33,3 +33,6 @@ back. Each ADR cites the spec sections it governs and the decision-log entries
 | [0024](0024-delegated-crews-two-person-rule.md) | Delegated crews; two-person (launch-code) rule, ≤ one agent key | D29 |
 | [0025](0025-progressive-conformance-ou-ratchet.md) | Conformance is structural: the progressive OU/SCP ratchet | D30 |
 | [0026](0026-cost-caps-hard-sandbox-advisory-preprod.md) | Cost caps: hard in sandbox, advisory + FinOps in pre-prod | D31 |
+| [0027](0027-cost-caps-lagging-backstop-preventive-ceiling.md) | Cost cap = lagging backstop; real-time ceiling is preventive (supersedes 0026 framing) | D32 |
+| [0028](0028-design-on-known-behaviour-spikes-confirm.md) | Design on known behaviour; spikes confirm/calibrate, not discover | D33 |
+| [0029](0029-continuous-harvest.md) | Continuous harvest — no pre-cleanup hold dependency | D34 |

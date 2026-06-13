@@ -135,3 +135,16 @@ multiple-choice rounds with delegation allowed ("you decide → recommendation l
 |---|---|---|---|
 | 34 | "Make the slides land concepts visually — best media (SVG / C4 / mermaid); start with the sunny day in August then the journey" | Deck rebuilt **sunny-day-first**: vignette + a rising **journey timeline**, then the journey via **six inline SVGs** (wall, wall→ramp, the ratchet, two-key launch, the cage, journey). **Inline SVG chosen** over mermaid/C4 — fully self-contained (mermaid needs a bundled renderer; SVG renders anywhere and is on-brand). Talk-track v2 | (deliverable) |
 | 35 | (erratum) two-key independence was self-contradictory ("neither key is the author" vs builder asserts) | Corrected to the coherent rule in §2.5/ADR-0024/D29 and the SVG: **two concurrences, ≥1 independent of the author (no self-approval; both for top classes), ≤1 an agent** | D29, ADR-0024 (erratum) |
+
+## Round 15 — cost-cap honesty + boundary (2026-06-13)
+
+| Q | Question | Answer | → |
+|---|---|---|---|
+| 36 | "Do the cost caps really work?" | Honestly: **not as a real-time hard ceiling** — ISB budget is a **lagging backstop** (Cost-Explorer lag; freeze≠spend-stop; terminate/nuke takes time), bounding spend to `maxSpend`+overshoot. The **real-time hard cap is preventive**: SCP-denied expensive vectors + Bedrock/AgentCore token & rate caps; keep budgets small. Defence in depth; Spike S0-5; ADR-0027 supersedes ADR-0026's "hard by construction" | D32, ADR-0027 |
+| 37 | "The spec is the ISB??" | **No.** ISB is AWS's product (its own source/spec); Causeway neither owns nor re-specs it. This spec is the **thin extension** consuming ISB via API/events (ADR-0001). The **§4.5 coherence map** labels every capability ISB's-vs-Causeway's line by line | (boundary; §1, §4.5) |
+
+## Round 16 — design on known behaviour, not spikes (2026-06-13)
+
+| Q | Question | Answer | → |
+|---|---|---|---|
+| 38 | "Too much that can be designed on first/known behaviours is being deferred to spikes" | Correct. New discipline: **design from validated behaviour first; spikes confirm/calibrate, never block** (ADR-0028). Biggest fix: **harvest redesigned continuous** (ADR-0029) — removes the unverified ISB cleanup-hold; old S0-1 demoted to non-blocking. Register reclassified: designed-now / confirm / calibrate, each with its designed answer + fallback | D33/D34, ADR-0028/0029 |
