@@ -22,3 +22,4 @@ back. Each ADR cites the spec sections it governs and the decision-log entries
 | [0013](0013-repo-at-lease-approval.md) | Repo at lease approval | D15 |
 | [0014](0014-simplicity-contract.md) | Simplicity contract + "no simpler" floor | D16–D18 |
 | [0015](0015-delegated-ou-scoped-scp-authority.md) | Target: delegated OU-scoped SCP authority (refines 0011) | D19 |
+| [0016](0016-wrap-dont-fork-mint-centrally.md) | Wrap, don't fork; preview left, mint centrally | D20, D21 |

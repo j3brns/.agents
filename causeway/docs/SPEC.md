@@ -1,7 +1,7 @@
 # The Graduated Innovation Stage ("Causeway")
 
-**Spec v0.5 — 2026-06-13 — status: SCP target posture decided (D19, ADR-0015); decisions
-D1–D19 are mirrored as immutable ADRs in [`docs/adr/`](adr/); interview record in
+**Spec v0.6 — 2026-06-13 — status: fork and left-shift rules decided (D20–D21, ADR-0016);
+decisions D1–D21 are mirrored as immutable ADRs in [`docs/adr/`](adr/); interview record in
 [`ANSWERS.md`](ANSWERS.md); refinement process in [`REFINEMENT.md`](REFINEMENT.md)**
 
 Extending **Innovation Sandbox on AWS (ISB)** into a first-class SDLC stage, so agentic
@@ -34,6 +34,8 @@ innovation and pre-prod.
 | D17 | Operator surface | **Two operated things** (§4.1): a trigger-driven **control project** (orchestrator-as-pipelines, no service, no database) and a **catalog monorepo** on a single release train (`release: N`) |
 | D18 | Simplicity floor | "No simpler" list (§15): stages, verifier, digest pinning, lineage, harvest-before-nuke, pinned-model evals, and the CCoE boundary are irreducible and may not be optimised away |
 | D19 | SCP target posture | **Preventive stage enforcement is the target**: negotiate **delegated SCP admin over the AccountPool OU subtree** with the CCoE, landed before first S2 entry. Detective-only = launch posture only. Whole-org SCP ownership refused permanently. Fallback if delegation declined: per-unit risk-acceptance sign-off at S2 entry (§2.3, ADR-0015) |
+| D20 | Fork rule | We wrap, never fork: `causeway-control` is the single ISB facade. Forking permitted only behind **three sequential gates** — S0-1 finds no hold, AND upstream contribution rejected, AND fallback race window unacceptable (ADR-0016) |
+| D21 | Left-shift rule | **Preview left, mint centrally**: the gate's verifier/policy/replay checks run locally as advisory `causeway verify` (same binary+versions as the gate); evidence is admissible only from platform runners with platform keys; agentcore-cli consumed, never forked or wrapped (ADR-0016) |
 
 ---
 
@@ -580,7 +582,13 @@ target?"):
    landed before first S2 entry; detective-only is launch posture; whole-org ownership
    refused; fallback = per-unit risk acceptance at S2 (D19, ADR-0015, §2.3).
 
-**Remaining for v0.6:**
+**Resolved in v0.6** (challenge round, 2026-06-13):
+
+9. Fork rule — wrap, never fork; fork only behind three sequential gates (D20, ADR-0016).
+10. Left-shift rule — preview left, mint centrally; `causeway verify` advisory in the
+    inner loop, evidence admissible only from platform runners (D21, ADR-0016).
+
+**Remaining for v0.7:**
 
 1. Who arbitrates the catalog contribution path (E9) — platform team only, or trusted BU
    maintainers with platform review? (Default until decided: platform team only.)
