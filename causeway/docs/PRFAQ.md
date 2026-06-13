@@ -69,10 +69,13 @@ eyes. Every promotion produces a signed, published certificate naming its eviden
 approvers.
 
 **Q: Can an agent with AWS credentials do something the pipeline didn't catch?**
-That is exactly why the target posture is preventive, not just detective: delegated SCP
-authority over the sandbox OU subtree, landed before any unit reaches Harden, so the
-stage rules bind every principal in the account — including a misbehaving agent — not
-just paths through our tooling.
+That is exactly why conformance is **structural, not procedural**: each stage tightens the
+account's own guardrails (SCPs), binding every principal — including a misbehaving agent —
+not just paths through our tooling. The account ratchets up through preventive SCP tiers as
+it matures, and the attestation certificate is what authorises each tightening. Detective
+pipeline checks decide *whether* you may climb; the SCP tier enforces the posture once you
+do. (This needs delegated SCP authority scoped to the sandbox subtree — landed before any
+unit reaches Harden. Without it we fall back to detective-only, with a named risk sign-off.)
 
 **Q: How do you verify something an AI generated?**
 We never verify generated programs in general — that's undecidable. We verify finite
@@ -96,10 +99,23 @@ your visible, recurring decision rather than our silent default.
 ### For finance / the budget owner
 
 **Q: How is cost controlled, and who watches commercial exposure?**
-Leases carry hard budget and duration caps enforced by the sandbox itself. On top of
-that, the adjudicator agent treats cost trajectory and commercial exposure as a
-first-class trigger: a change that elevates spend or commercial risk routes to you for a
-second signature before it proceeds. Chargeback rolls up per business unit.
+Two regimes, split at the pool boundary. **In the sandbox (S0–S2)** every lease carries a
+**hard budget enforced by Innovation Sandbox itself**: breach a threshold and the account
+freezes; at the ceiling our control plane terminates and recycles it. Because freezing
+alone doesn't stop already-running resources, the *ceiling* action is termination, and
+thresholds sit below the true cap to absorb billing latency — so a self-asserting crew's
+spend is bounded by construction. **In pre-prod (S3)** the workload isn't disposable, so a
+kill-switch would be an outage: cost reverts to your **existing FinOps process** (budgets,
+anomaly detection, showback/chargeback), with Causeway feeding advisory cost evidence.
+Separately, the adjudicator treats within-cap cost *elevation* as a trigger for crew
+two-key concurrence. Chargeback rolls up per business unit.
+
+**Q: Who actually approves things — is this another approval queue?**
+No — that's the point. Authority is **delegated to qualified crews**. An elevated action
+needs **two authorized people-or-agents in the crew to concur** (the launch-code rule;
+at most one is an agent, neither is the author). You only escalate out-of-band when an
+action exceeds what your crew is qualified for. The continuous out-of-band approval queue
+is exactly what we removed.
 
 ### For the skeptic
 

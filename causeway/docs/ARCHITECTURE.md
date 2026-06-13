@@ -91,7 +91,7 @@ sequenceDiagram
 
   ISB->>EB: CleanAccountRequest (lease ended)
   EB->>CTRL: trigger
-  CTRL->>ISB: freeze lease (stop spend)
+  CTRL->>ISB: freeze lease (halt access; note freeze≠spend-stop §4.5)
   CTRL->>HV: run harvest (idempotent, incremental)
   HV-->>HV: push digest · export baselines · write experiment record
   alt completes within deadline
@@ -118,3 +118,24 @@ eval suite (pinned model, N trials) ─► pass ─┼─► (machine-written) �
 image build ─► digest + SLSA-L1 + cosign ────┤                         = MR approvable
 lineage stamps (template@ver + diff) ────────┘
 ```
+
+## 6. Two-key promotion + the SCP-tier ratchet (v0.10 — §2.5, §3.1, §4.5)
+
+Authority is delegated to qualified crews; conformance is an **account-level SCP ratchet**
+(not an OU move — ISB drift-quarantines unexpected OU placement, §4.5).
+
+```mermaid
+flowchart TB
+  push["crew push / promote MR"] --> adj{adjudicator agent\nrisk · cost · in envelope?}
+  adj -- "clear" --> prov["self-assert → proceed provisionally\n(verify async; revoke on fail)"]
+  adj -- "elevated, in envelope" --> two["two-person rule\nkey1 (author≠) + key2\n≤ one agent"]
+  adj -- "beyond envelope" --> oob["out-of-band escalation\n(the exception)"]
+  two --> cert
+  prov --> cert["certificate issues\n(verifier passed)"]
+  cert -- "authorizes" --> ratchet["attach next SCP tier\nS0⊂S1⊂S2 · account stays in ISB Active OU\nmonotonic · detached on recycle"]
+  ratchet --> enforce["preventive: binds every principal,\nincluding a credentialed agent"]
+```
+
+Cost envelope (parallel, structural): ISB tracks `maxSpend` and `FREEZE_ACCOUNT`s at a
+threshold; the **control project terminates at the ceiling** (freeze ≠ spend-stop), so a
+self-asserting crew cannot run spend past the cap. Pre-prod (S3) is advisory + FinOps.

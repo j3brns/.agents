@@ -103,3 +103,28 @@ multiple-choice rounds with delegation allowed ("you decide → recommendation l
 | Q | Question | Answer | → |
 |---|---|---|---|
 | 27 | "Make some slick slides — frame it as accelerating fast permissive AI access with progressive conformance, no continuous out-of-band approvals" | Self-contained HTML deck ([`slides/causeway.html`](../slides/causeway.html), 14 slides) + presenter talk-track; acceleration-led narrative, adjudicator + trust-but-verify as the "no continuous approvals" core; published to Pages | (deliverable) |
+
+## Round 12 — delegate to crews, structural conformance, cost caps (2026-06-13)
+
+| Q | Question | Answer | → |
+|---|---|---|---|
+| 28 | "It doesn't promote reverting delegation to the builders — qualified crews, XO/launch-code, two actors agree, one may be an agent" | **Authority reverts to qualified crews**; out-of-band approver replaced by the **two-person/launch-code rule** (≤ one agent key, neither the author, inside the envelope); off-band only beyond the crew's qualified envelope | D29, ADR-0024 |
+| 29 | "Why aren't we moving accounts through progressive OUs with increasing conformance?" | We are now — **conformance is structural**: the **OU/SCP ratchet** (account climbs additive SCP tiers; certificate authorizes; monotonic, per-lease) is the primary preventive enforcement; pipeline-only is the fallback. New Spike S0-4 | D30, ADR-0025 |
+| 30 | "Cost caps are vital — for the ISB side" | **Hard, ISB-enforced caps in the sandbox (S0–S2)**: lease `maxSpend` + `budgetThresholds`→freeze; ceiling→terminate (control-plane-driven, since freeze ≠ spend-stop); headroom for Cost-Explorer latency | D31, ADR-0026 |
+| 31 | "Advisory for the pre-prod side — FinOps process applies" | **S3 pre-prod = advisory + org FinOps** (no hard freeze on a non-disposable account); Causeway feeds advisory cost evidence | D31, ADR-0026 |
+
+## Round 13 — ISB coherence + agentic-first (2026-06-13)
+
+| Q | Question | Answer | → |
+|---|---|---|---|
+| 32 | "These are features of the AWS ISB — review it thoroughly, validate coherence, not generalities" | Launched a sourced ISB validation pass; corrected OU-ratchet realization and cost-cap attribution to actual ISB behaviour (lifecycle OUs + drift-quarantine; budget actions = alert/freeze, terminate is Causeway-driven); added §4.x ISB coherence map | (see §3.1, §4, ADR-0025/0026 corrections) |
+| 33 | "Be clear this is agentic development first" | Added **scope-primacy** statement (SPEC intro, README, tenet 1, mental-model): the sole target workload is agents on Bedrock AgentCore under AI-DLC; every mechanism is shaped by that | (framing) |
+
+## Open questions (carry-forward, updated)
+
+| # | Question | Default until answered |
+|---|---|---|
+| O1 | Who arbitrates the catalog contribution path (E9)? | Platform team only |
+| O2 | Permanent naming ("Causeway", stage names)? | Working titles stand |
+| O3 | Split SPEC.md into linked section files at v1.0? | Keep monolithic + comms on-ramp |
+| O4 | Crew qualification model — who grants/revokes a crew's risk/cost envelope? | Platform team grants; attestation history + adjudicator govern |

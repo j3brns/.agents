@@ -46,6 +46,12 @@ Causeway extends **[Innovation Sandbox on AWS](https://github.com/aws-solutions/
 graduated innovation stage for **agentic workloads on Amazon Bedrock AgentCore**, built
 under **AI-DLC**, with **GitLab** as the evidence-generating outer loop.
 
+**Agentic development first.** This is not a general-purpose sandbox. The target workload
+is building **agents on Bedrock AgentCore**; every stage, gate, and control is shaped by
+that — authority is delegated to **qualified crews** (two keys to launch, one may be an
+agent), conformance is **structural** (the account ratchets up through preventive SCP
+tiers), and cost is **hard-capped in the sandbox, FinOps-governed in pre-prod**.
+
 Four stages: **S0 Explore → S1 Incubate → S2 Harden → S3 Pre-prod.** One file for
 developers (`causeway.yml`). Two operated things for the platform team (a control
 project and a catalog monorepo). Four on-call alarms. Seven things that may never be
@@ -58,12 +64,12 @@ simplified away.
 | [`docs/PRFAQ.md`](docs/PRFAQ.md) | Press release + FAQ — the out-of-band pitch by stakeholder |
 | [`docs/TENETS.md`](docs/TENETS.md) | The tenets — tie-break ordered, each citing its ADRs |
 | [`docs/MENTAL-MODEL.md`](docs/MENTAL-MODEL.md) | One-page mental model: the wall→ramp, parcel+passport, customs |
-| [`docs/SPEC.md`](docs/SPEC.md) | The full specification (v0.9) — stages, self-asserted governance, evidence, epics |
+| [`docs/SPEC.md`](docs/SPEC.md) | The full specification (v0.10) — stages, self-asserted governance, evidence, epics |
 | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Component and sequence views (diagrams) |
-| [`docs/adr/`](docs/adr/) | 23 immutable Architecture Decision Records — the *why* behind every load-bearing choice |
+| [`docs/adr/`](docs/adr/) | 26 immutable Architecture Decision Records — the *why* behind every load-bearing choice |
 | [`docs/ANSWERS.md`](docs/ANSWERS.md) | The stakeholder interview record that produced the decisions |
 | [`docs/REFINEMENT.md`](docs/REFINEMENT.md) | The refinement loop: how this spec evolves, by humans or CLI agents |
-| [`docs/SPIKES.md`](docs/SPIKES.md) | Spike 0 — the three assumptions that must become facts before roadmap commitment |
+| [`docs/SPIKES.md`](docs/SPIKES.md) | Spike 0 — the four assumptions that must become facts before roadmap commitment |
 | [`slides/causeway.html`](slides/causeway.html) | Slide deck (self-contained HTML) — the pitch; `slides/TALK-TRACK.md` for the talk-track |
 | [`runbooks/`](runbooks/) | Operator day-2: operations, break-glass, harvest failure |
 | [`AGENTS.md`](AGENTS.md) | Operating contract for CLI agents (Kiro, Claude Code, others) working this repo |
@@ -71,7 +77,7 @@ simplified away.
 
 ## Status
 
-Specification, v0.9. No production code yet — deliberately. Spike 0
-([`docs/SPIKES.md`](docs/SPIKES.md)) converts the three riskiest assumptions into facts
+Specification, v0.10. No production code yet — deliberately. Spike 0
+([`docs/SPIKES.md`](docs/SPIKES.md)) converts the four riskiest assumptions into facts
 before any roadmap is committed. The build order after that is
 [`docs/SPEC.md` §11](docs/SPEC.md): control project first, catalog second.

@@ -27,9 +27,17 @@ or cost. The adjudicator is the "verify" that makes self-assertion safe.
 - WHEN the requested transition crosses S2→S3, THE verdict SHALL be `four-eyes-required`
   unconditionally (the governed-estate boundary).
 
-## R4 — Routing
-- WHEN risk-elevated, THE escalation SHALL route to a security-competent reviewer
-  (CODEOWNERS/approval rule); WHEN cost-elevated, to the BU budget owner; both if both.
+## R4 — Routing (two-person rule, delegated to the crew — ADR-0024)
+- WHEN elevated within the crew's qualified envelope, THE adjudicator SHALL require the
+  **two-person rule**: two authorized concurrences from actors qualified >= the action's
+  class, **at most one an agent**, **neither the author**. Concurrence is a GitLab
+  approval rule keyed to qualification, NOT a central group.
+- THE adjudicator MAY hold the second key when it has standing for the class and did not
+  author the change.
+- WHEN the action EXCEEDS the crew's qualified envelope, THE adjudicator SHALL escalate
+  out-of-band (the exception). WHEN cost is the axis, the hard ceiling is ISB-structural
+  (ADR-0026) and is never the adjudicator's to waive — only trajectory within the cap is
+  adjudicated.
 
 ## R5 — Attestable adjudication
 - THE adjudicator's verdict, reasons, policy-pack version, and inputs digest SHALL be

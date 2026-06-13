@@ -30,3 +30,6 @@ back. Each ADR cites the spec sections it governs and the decision-log entries
 | [0021](0021-risk-cost-adjudicator.md) | Risk & cost adjudicator: fail-safe, monotonic skill | D26 |
 | [0022](0022-attestation-certificates.md) | Attestation certificates: signed, published, revocable | D27 |
 | [0023](0023-gitlab-centric-tool-neutral-data.md) | GitLab-centric binding over tool-neutral data | D28 |
+| [0024](0024-delegated-crews-two-person-rule.md) | Delegated crews; two-person (launch-code) rule, ≤ one agent key | D29 |
+| [0025](0025-progressive-conformance-ou-ratchet.md) | Conformance is structural: the progressive OU/SCP ratchet | D30 |
+| [0026](0026-cost-caps-hard-sandbox-advisory-preprod.md) | Cost caps: hard in sandbox, advisory + FinOps in pre-prod | D31 |

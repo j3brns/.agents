@@ -1,5 +1,9 @@
 # The Graduated Innovation Stage ("Causeway")
 
+**Spec v0.10 — 2026-06-13 — status: authority delegated to qualified crews (two-person rule),
+conformance made structural (OU ratchet), cost caps hard-in-sandbox/advisory-in-pre-prod
+(D29–D31, ADR-0024–0026). Superseded header below retained for history.**
+
 **Spec v0.9 — 2026-06-13 — status: self-asserted trust-but-verify governance + attestation
 certificates + portability seam (D25–D28, ADR-0020–0023); comms artifacts added
 ([PRFAQ](PRFAQ.md), [TENETS](TENETS.md), [MENTAL-MODEL](MENTAL-MODEL.md)); decisions
@@ -10,6 +14,13 @@ Extending **Innovation Sandbox on AWS (ISB)** into a first-class SDLC stage, so 
 workloads built under AI-DLC graduate from a prudently permissive sandbox to pre-prod
 through **progressive, evidence-generating GitLab pipelines** — removing the wall between
 innovation and pre-prod.
+
+> **Scope primacy — agentic development first.** Causeway is *not* a general-purpose cloud
+> sandbox. Its single target workload is **agents on Amazon Bedrock AgentCore, built under
+> AI-DLC** (§1.3). Every mechanism — the `agentcore/` artefact as the promotable unit, the
+> evaluators/replay/Cedar-tool gates, the model-governance ladder, the AgentCore-native
+> observability feeding evidence — is shaped by that workload. Read everything below as
+> "for building agents", not "for arbitrary infrastructure".
 
 ---
 
@@ -45,6 +56,9 @@ innovation and pre-prod.
 | D26 | Risk/cost adjudicator | A fail-safe, monotonic **adjudicator skill** classifies risk + commercial/cost per change; trip-wire packs are authoritative, reasoning is additive-only, ambiguity escalates; its verdict is itself evidence ([skill spec](../.kiro/specs/risk-cost-adjudicator/requirements.md), ADR-0021) |
 | D27 | Attestation certificates | Each stage transition issues a signed, human-readable **certificate** (evidence + adjudication + approvers + verifying release), **published to the docs site** as the unit's stamped passport; revocation is append-only (§9.3, ADR-0022) |
 | D28 | Portability seam | **GitLab-centric by choice, not by trap**: manifests, certificates, and adjudicator verdicts are tool-neutral data; GitLab approval rules / Pages / catalog are the current binding. No portability abstraction tax paid in v1 (ADR-0023) |
+| D29 | Delegated crews + two-person rule | Authority **reverts to qualified crews**; elevation is satisfied by the **two-person (launch-code) rule** — two authorized actors concur, **≤ one may be an agent**, neither is the author, both inside the crew's envelope. **Out-of-band escalation only when beyond the crew's qualified envelope** (corrects the original out-of-band routing) (§2.5, ADR-0024) |
+| D30 | Progressive-conformance SCP ratchet | Stages are **additive SCP tiers** (`S0⊂S1⊂S2`); because ISB OUs are lifecycle and drift-quarantines moves, the tier is realised as **account-level SCPs while the account stays in `Active`** (not stage-OU moves). Promotion **attaches the next tier, authorized by the certificate**, monotonic, per-lease (detached on recycle). Pipeline→evidence; certificate→authorizes; SCP→enforces. Primary; pipeline-only is fallback. Spike S0-4 (§3.1, §4.5, ADR-0025) |
+| D31 | Cost caps: hard in sandbox, advisory in pre-prod | **S0–S2: hard** = ISB `maxSpend`/Cost-Explorer tracking + native `ALERT`/`FREEZE_ACCOUNT` **plus Causeway-driven `terminate` at the ceiling** (ISB has no native terminate-at-threshold; freeze≠spend-stop; Cost-Explorer latency→headroom). Bounds crew blast radius by construction; not self-assertable. **S3: advisory + org FinOps** (§3.1, §4.5, ADR-0026) |
 
 ---
 
@@ -209,7 +223,7 @@ account quarantined, drift detected, verifier failure *at an approved gate* (ver
 failures in ordinary MRs are the developer's signal, not the operator's). Budget and
 duration enforcement stay ISB's job — the platform team does not re-implement them.
 
-### 2.5 Self-asserted governance: inner loop by default, four-eyes on adjudicated elevation (D25/D26)
+### 2.5 Self-asserted governance: delegated to qualified crews, two keys to launch (D25/D26/D29)
 
 The earlier model implied a synchronous gate at every promotion. That over-taxes the
 common case, where most changes carry no real risk. The governing principle is now:
@@ -231,16 +245,31 @@ Three moving parts make this safe rather than merely fast:
    governed-estate boundary). The adjudicator's own verdict is recorded as evidence.
 3. **Trust-but-verify, with revocation** (ADR-0020). A `self-assertable` promotion
    proceeds **provisionally**: the verifier still runs, asynchronously; if its evidence
-   fails, the certificate is **revoked and the unit frozen**. A `four-eyes-required`
-   promotion **blocks** on both the routed second approval (risk → security CODEOWNERS;
-   cost → BU budget owner) and the verifier before any certificate issues.
+   fails, the certificate is **revoked and the unit frozen**.
+4. **The two-person rule — delegated to the crew, not escalated off it** (D29, ADR-0024).
+   This is the correction to the original sin of routing elevation to an out-of-band
+   approver — which would re-import the very committee the model exists to kill. Authority
+   is **delegated down to qualified crews** (builders who hold a qualification for a given
+   risk/cost class). When the adjudicator returns `two-keys-required`, the control is the
+   **launch-code rule**: *two authorized actors concur*, and **one of the two may be an
+   agent** — but never both (the safety invariant is *at most one agent key*). Both keys
+   come from **inside the crew's delegated envelope**; neither key may be the author of
+   the change (independence). The adjudicator may itself hold the second key when it has
+   standing for that class and did not author the change. **Out-of-band escalation is the
+   exception, not the rule**: it fires only when the action *exceeds the crew's qualified
+   envelope* (a risk class they don't hold, or cost beyond their authority — and even then
+   the cost ceiling is structurally capped, §3.1). A certificate issues only when the
+   verifier passes **and** the two concurrences are present.
 
-This is how authority moves from platform-held to **self-asserted**: the right to
-self-assert is earned by a unit's attestation history and revoked by failure (tenet 11).
-Ceremony is rationed to adjudicated elevation and the one hard boundary — everywhere else,
-the loop runs at sandbox speed. The floor property "evidence, not opinion" is preserved
-because a *durable* certificate still requires the verifier to pass; self-assertion only
-relocates *when* the block falls, never *whether* evidence is required.
+This is how authority moves from platform-held to **delegated and self-asserted**: a crew
+is trusted with fast, permissive, two-key authority *because it operates inside a box it
+cannot blow out of* — the permission envelope is hard-walled by the OU/SCP ratchet (§3.1)
+and the cost envelope by ISB lease caps (§3.1). The hardness of the cage is what licenses
+the freedom inside it. Ceremony is rationed to adjudicated elevation and the one hard
+boundary (S2→S3); everywhere else the loop runs at sandbox speed. The floor property
+"evidence, not opinion" is preserved because a *durable* certificate still requires the
+verifier to pass; the two-person rule changes *who turns the keys* (the crew, one possibly
+an agent), never *whether* evidence is required.
 
 ## 3. The stage ladder (D4 — recommendation: four stages)
 
@@ -252,9 +281,11 @@ turning a working prototype into an attestable system, which is precisely the wa
 |---|---|---|---|---|
 | *Purpose* | falsify/validate the idea | make it real, repeatable | make it attestable | make it operable |
 | **Account** | ISB lease (pooled, recycled) | ISB lease, longer/renewable tier | ISB lease, locked tier | CCoE-vended governed account (rebuild) |
-| **Lease template** | auto-approve, e.g. $50 / 7 days | manager-approved, $250 / 30 days | platform-approved, $500 / 30 days | n/a (no lease) |
+| **Conformance tier (§3.1)** | S0 SCP tier (account-level, in `Active` OU) | ratchet → S1 SCP tier | ratchet → S2 SCP tier | leaves the pool → landing-zone OU |
+| **Cost cap (§3.1)** | **hard** — ISB `maxSpend`/freeze + Causeway terminate at ceiling; $50 / 7d | **hard** — $250 / 30d | **hard** — $500 / 30d | **advisory + FinOps** — no hard freeze; org budgets/anomaly/showback |
+| **Lease template** | auto-approve | crew two-key (incubate class) | crew two-key (harden class) | n/a (no lease) |
 | **Blueprint at provision** | S0 bootstrap (repo, OIDC trust, observability) | S1 bootstrap (+ private networking, logging) | S2 bootstrap (+ egress controls, KMS) | landing-zone baseline |
-| **Infra permissions** | stock ISB SCPs (Nuke-cleanable services, region limits) | + pipeline-enforced IaC-only rule (drift detection fails the pipeline) | + deny console mutations except break-glass (CCoE-dependent SCP tier) | full org guardrails |
+| **Infra permissions** | S0-OU SCP tier (Nuke-cleanable services, region limits) | S1-OU SCP tier (+ IaC-only: deny mutations off the pipeline OIDC role) | S2-OU SCP tier (+ deny console mutations except break-glass) | full org guardrails |
 | **Model policy (§7)** | any Bedrock model, cost-capped | pinned from first eval baseline; org deny-list | org allowlist; pinned + recorded params | pinned model ID + params in attested config |
 | **AgentCore packaging (§5)** | direct code deploy (CLI default) | **OCI image, digest-pinned** | OCI, signed + SLSA provenance | same digest, redeployed |
 | **Tool governance** | Gateway open within account; Cedar log-only | Cedar policies enforced; tool allowlist drafted | Cedar policy suite has tests; allowlist frozen | Cedar attested, change-controlled |
@@ -263,7 +294,76 @@ turning a working prototype into an attestable system, which is precisely the wa
 
 **Stage state is data, not folklore**: the stage is a field in the promotion manifest (§9.2)
 and is mirrored as the lease's template tier in ISB and the repo's compliance-framework
-label in GitLab. One source of truth (the manifest), two enforcement projections.
+label in GitLab. One source of truth (the manifest), three enforcement projections —
+GitLab compliance label, ISB lease tier, and the **conformance SCP tier** (§3.1).
+
+### 3.1 Conformance is structural: the SCP-tier ratchet and the cost cap (D30/D31)
+
+Two things make the stage *real* rather than a label, and both are AWS-native and
+**preventive** — they bind every principal in the account (including an agent with
+credentials), not just paths through our tooling. **This subsection is written against
+ISB's *actual* behaviour** (validated; see the coherence map §4.5) — not an idealised one.
+
+**ISB facts that constrain the design** (validated against `isb-account-pool-resources.ts`
+and the OpenAPI): ISB's seven OUs (`Available, Active, CleanUp, Quarantine, Entry, Exit,
+Frozen`) are **lifecycle** OUs; ISB runs **drift detection that quarantines an account
+found in an unexpected OU**; and `WriteProtectionScp` is attached to every pool OU *except*
+`Active` and `Frozen` (so a leased = `Active` account can write — that's the point of a
+lease). Two consequences: (1) we must **not** express stages by moving an `Active` account
+into sibling `Causeway/Sn` OUs — that would trip drift→quarantine; (2) the conformance
+tiers are *additive restrictions* layered on top of the four pool-wide SCPs.
+
+**The SCP-tier ratchet (D30, ADR-0025).** A leased account *climbs* a ratchet of **additive
+conformance SCP tiers** (`S0 ⊂ S1 ⊂ S2` in strictness) while it **stays in ISB's `Active`
+OU** — the tier is realised as **account-level SCPs attached directly to the member
+account** (AWS Organizations permits account-targeted SCPs), so no OU move and no drift
+trip. Promotion S_n→S_{n+1} **attaches the next, stricter tier**, taking effect immediately
+and preventively. The attachment is **authorized by the attestation certificate** (§9.3) —
+evidence unlocks the ratchet click. Properties:
+- **Monotonic within a lease**: the account only ever tightens; loosening is an *explicit*,
+  logged downward move (revocation/freeze).
+- **Per-lease, reset on recycle**: at lease end ISB CleanUp nukes the account and returns
+  it to `Available`; the Causeway tier is detached so the next lease starts at S0. The
+  ratchet position is a property of the lease, not the account. S3 is **not** a click — it
+  leaves the pool entirely (rebuild into a CCoE-vended governed account, ADR-0002), because
+  pre-prod isn't disposable.
+- **Pipeline produces evidence; certificate authorizes; the SCP tier enforces.** Detective
+  checks (pipeline) gate the *authorization*; preventive SCPs enforce the *posture*. This
+  corrects the earlier "pipeline-primary, SCP-as-target" framing: the SCP ratchet is the
+  **primary** enforcement; pipeline-only is the graceful-degradation fallback if delegation
+  is declined (ADR-0015).
+- **Realisation is spiked, not assumed** (Spike S0-4): whether ISB tolerates account-level
+  SCPs on a pooled account without reverting/quarantining, and whether CleanUp detaches
+  them on recycle, is **unverified**. Fallback ladder: **account-level SCP stack** (primary)
+  → **true stage-OUs** *only if* the CCoE extends ISB's expected-OU/drift config to treat
+  them as `Active`-equivalent (heavier, CCoE-owned) → **pipeline-only** (degraded).
+
+**The cost cap is hard in the sandbox, advisory in pre-prod (D31, ADR-0026).** Cost caps
+are **vital**, and structural while an account is disposable — but the *mechanism* is split
+precisely between ISB and Causeway, because ISB's native budget actions are limited:
+- **What ISB does natively** (validated, OpenAPI `BudgetThresholds`): tracks spend against
+  the lease `maxSpend` (via Cost Explorer) and, at `budgetThresholds`, takes one of exactly
+  two actions — **`ALERT`** or **`FREEZE_ACCOUNT`**. There is **no native "terminate at
+  ceiling"** action. And **`FREEZE_ACCOUNT` removes access but does not stop already-running
+  spend.**
+- **What Causeway adds to make the cap *hard***: the **control project** subscribes to the
+  budget-breach event / `BudgetExceeded` status and, at the configured ceiling, calls
+  **`POST /leases/{id}/terminate`** → harvest → nuke (which *does* stop spend). So the hard
+  cap = **ISB budget tracking + `FREEZE_ACCOUNT` (native) + Causeway-driven terminate at the
+  ceiling**. This is the honest attribution; "ISB-enforced" alone would be false.
+- **Two design consequences**, both configured not assumed: (a) because freeze ≠ spend-stop,
+  the **ceiling action must be terminate**, owned by the control project; (b) because Cost
+  Explorer data lags, thresholds must leave **headroom** below the true ceiling. Together
+  these bound a self-asserting crew's blast radius by construction: neither key can run
+  spend past the ceiling, because the control plane terminates the lease. The adjudicator
+  governs within-cap cost *trajectory* (routing elevation to crew two-key concurrence); the
+  hard ceiling is structural and not self-assertable.
+- **S3 (pre-prod, governed account): advisory + FinOps.** Once the workload leaves the
+  pool it is no longer disposable; a hard freeze would be a self-inflicted outage.
+  There, cost governance reverts to the organization's **existing FinOps process** —
+  budgets, anomaly detection, showback/chargeback, commitment management — with Causeway
+  contributing *advisory* signals (cost evidence on the certificate), not a kill switch.
+  Hard-cap the experiments; FinOps-govern the pre-prod workload.
 
 ---
 
@@ -329,6 +429,33 @@ On lease end without graduation, the harvest pipeline runs **before** cleanup:
    decision: park / kill / revive) to the BU's catalog area.
 6. Signal the control project → cleanup proceeds → account recycles. Nothing of value dies
    with the account; the account stays disposable.
+
+### 4.5 ISB coherence map — every Causeway mechanism against a *validated* ISB feature
+
+Each row pairs a Causeway mechanism with the **specific ISB feature** it relies on and a
+coherence verdict. `[V]` = verified against ISB source/OpenAPI; `[U]` = unverified,
+carried as a spike. Sources: `source/infrastructure/lib/isb-account-pool-resources.ts`,
+`docs/openapi/innovation-sandbox-api.yaml`, the Implementation Guide.
+
+| Causeway mechanism | ISB feature it uses | Coherence |
+|---|---|---|
+| Repo+account born at lease approval (ADR-0013) | `LeaseApproved` EventBridge event; `POST /leases` | `[V]` clean — event-driven, API-native |
+| Stage bootstrap at provision (E2) | `blueprintId` on lease template → StackSet at provisioning; `/blueprints` | `[V]` ISB-native blueprint mechanism |
+| Conformance SCP-tier ratchet (ADR-0025) | Account stays in **`Active`** OU (no `WriteProtectionScp` there); **account-level SCPs** layered on the 4 pool-wide SCPs | `[U]` **Spike S0-4** — does ISB tolerate account-level SCPs without drift/revert? Must NOT move the account between OUs (would trip drift→quarantine) |
+| "Don't express stages as OU moves" | 7 OUs are **lifecycle**; **drift detection quarantines** unexpected OU placement (`AccountDriftDetected`) | `[V]` constraint respected — this is *why* we use account-level SCPs, not stage-OUs |
+| Hard cost cap, sandbox (ADR-0026) | `maxSpend` + `budgetThresholds` = **`ALERT`/`FREEZE_ACCOUNT` only**; spend via Cost Explorer | `[V]` — and therefore the ceiling **terminate is Causeway's**, not ISB's |
+| Ceiling → terminate | `BudgetExceeded` status / freeze event → control project calls **`POST /leases/{id}/terminate`** | `[V]` API exists; the automation is Causeway control-plane (not a native budget action) |
+| "Freeze isn't a spend-stop" caveat | `FREEZE_ACCOUNT` removes access; **running resources keep spending** | `[V]` exactly why ceiling action must be terminate |
+| Harvest-before-nuke, bounded (ADR-0008) | `CleanAccountRequest` event precedes Step Functions→CodeBuild→AWS Nuke | `[U]` **Spike S0-1** — is there a supported pre-cleanup *hold*? Fallback: harvest at duration-threshold |
+| Recycle resets to S0 | ISB CleanUp nukes and returns account to `Available` | `[V]` lifecycle; `[U]` that our account-level SCPs detach on recycle → S0-4 |
+| Preventive S2 controls (ADR-0015) | SCPs on the AccountPool subtree (CCoE-owned) | `[U]` delegation negotiation; degrade to detective-only if declined |
+| Pipeline vends lease + OIDC (ADR-0004) | `POST /leases`; blueprint-deployed OIDC trust role | `[U]` **Spike S0-2** — ISB's API auth model expects IdC users; service-principal path may need design |
+
+**Net coherence verdict.** The design is coherent with ISB **provided** two account-pool
+integration questions resolve (S0-4: account-level SCPs without drift/quarantine; S0-1: a
+pre-cleanup harvest hold) and one attribution is stated honestly (the cost *ceiling
+terminate* is Causeway's control-plane behaviour, not an ISB budget action). None of these
+requires forking ISB; all are consistent with "consume via API and events" (ADR-0001).
 
 ---
 
@@ -620,8 +747,11 @@ Simplification proposals that touch them need a replacement mechanism, not a del
 |---|---|---|
 | Four stages | explainable, auditable governance ramp | a continuous risk score — unauditable, unexplainable to a CISO |
 | Evidence verifier before every *durable* certificate | promotion = verified evidence, not opinion | "green pipeline = promotable" — conflates build success with attestation. *(Refined by ADR-0020: self-assertion may proceed provisionally, but the durable certificate still requires the verifier — replacement mechanism = async-verify-with-revocation, not a weakening.)* |
-| Self-assertion is provisional and revocable; four-eyes on adjudicated elevation | speed without abandoning evidence; ceremony spent where risk/cost is real | "self-assert and you're done" (drops the async verify + revocation) / "four-eyes on every promotion" (re-taxes the common case the model exists to free) |
+| Self-assertion is provisional and revocable | speed without abandoning evidence | "self-assert and you're done" — drops the async verify + revocation |
 | Adjudicator is fail-safe and monotonic | the agent that rations ceremony cannot be the hole | "let the model decide what's risky" — a reasoning layer that can *clear* a ruled trip-wire; ambiguity that resolves to proceed |
+| Two-person rule, delegated to the crew; ≤ one agent key | second pair of eyes without a shore-based committee | "route elevation to security/budget owners" — re-imports the out-of-band approver the model exists to kill / "let an agent self-concur" or "two agent keys" — removes the human floor |
+| Conformance is structural (OU/SCP ratchet), not merely procedural | preventive control binds every principal, including a credentialed agent | "enforce stages in the pipeline only" — detective; an agent with creds routes around it |
+| Sandbox cost caps are hard and ISB-enforced; ceiling terminates | the financial blast radius of a self-asserting crew is bounded by construction | "let the adjudicator watch spend" — soft; misses the structural backstop. (S3 pre-prod is deliberately advisory+FinOps — a different regime for a non-disposable account, not a weakening) |
 | Digest-pinned OCI from S1; same digest S2→S3 | artefact identity across accounts | rebuild-per-stage — severs the evidence chain at exactly the wall |
 | Lineage stamping on skill-adapted instances | generation without trust | "the skill is approved, so its output is" — trust in generation, the original sin |
 | Harvest-before-nuke with completion signal | no knowledge dies with an account | nuke-on-expiry — recreates the wall as an outcome |
@@ -698,7 +828,18 @@ target?"):
     files; the comms trio is the human front door for now. Candidate for v1.0 cleanup —
     logged as O3.
 
-**Remaining for v0.10:**
+**Resolved in v0.10** (2026-06-13, "revert delegation to qualified crews + structural conformance + cost caps"):
+
+19. **Authority reverts to qualified crews**; out-of-band approver replaced by the
+    **two-person/launch-code rule** (≤ one agent key, neither the author, inside the
+    envelope); out-of-band only beyond the crew's qualified envelope (D29, ADR-0024).
+20. **Conformance made structural**: the **OU ratchet** (additive SCP tiers; certificate
+    authorizes the climb; monotonic, per-lease) is the primary, preventive enforcement;
+    pipeline-only is the fallback. New Spike S0-4 (D30, ADR-0025).
+21. **Cost caps**: hard and ISB-enforced in the sandbox (ceiling→terminate); advisory +
+    FinOps in pre-prod (D31, ADR-0026). Deck + comms updated to promote crew delegation.
+
+**Remaining for v0.11:**
 
 1. Who arbitrates the catalog contribution path (E9) — platform team only, or trusted BU
    maintainers with platform review? (Default until decided: platform team only.)

@@ -1,6 +1,8 @@
 # Causeway — Mental Model
 
-One page. If you remember nothing else, remember the pictures.
+One page. If you remember nothing else, remember the pictures. **This is about agentic
+development first** — building agents on Bedrock AgentCore under AI-DLC; everything below
+serves that.
 
 ## The reframe: the wall is a ramp
 
@@ -57,9 +59,19 @@ commercial exposure). Customs, automated:
 ```
 
 **Trust, but verify — and revoke.** Low-stakes crossings trust your assertion and verify
-behind you; if the evidence fails, the certificate is revoked and the unit freezes. Only
-adjudicated elevation, and the one hard boundary (S2→S3, into the governed estate), pull
-in a second human. Ceremony is rationed to where it earns its cost.
+behind you; if the evidence fails, the certificate is revoked and the unit freezes.
+
+**Elevation isn't a trip to shore — it's two keys on the boat.** When the adjudicator
+flags real risk or cost, the control is the **launch-code rule**: two authorized actors
+in the crew concur, and **one may be an agent** (never both; never the author). You only
+phone the admiralty — off-band escalation — when the action exceeds what the crew is
+qualified for. That's the exception, not the rhythm.
+
+**The cage licenses the freedom.** You can be trusted with the keys because you're in a
+box you can't blow out of: the account's **guardrails tighten structurally** at each stage
+(preventive, binding even an agent with credentials), and the **lease has a hard budget**
+that freezes and recycles the account before you can overspend. Hard walls are what make
+fast, permissive authority safe.
 
 ## The loop that improves the system itself
 

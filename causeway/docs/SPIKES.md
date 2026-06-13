@@ -43,6 +43,22 @@ and linked from the governing ADR (per [`REFINEMENT.md`](REFINEMENT.md) step 5).
 - **Fallback if failed**: usually a non-reproducible evidence item — pin it or drop it
   from the v1 ledger; record in ADR.
 
+## S0-4 · The OU ratchet vs. ISB drift (governs ADR-0025) — **new in v0.10**
+
+- **Claim**: a delegated actor can express per-lease progressive conformance by **attaching
+  account-level SCPs to a pooled account while it stays in ISB's `Active` OU** (primary —
+  no OU move, so no drift trip), and ISB **CleanUp detaches them on recycle**. Secondary:
+  whether true stage-OUs are viable at all given ISB drift-quarantine.
+- **Experiment**: in the S0-1 test org, with delegated SCP admin: **(primary)** lease an
+  account, attach S1 then S2 account-level SCPs while it stays in `Active`, confirm no
+  drift→quarantine and that the SCPs bind; end the lease and confirm CleanUp detaches them
+  (next lease starts at S0). **(secondary)** attempt a sibling-OU move and observe whether
+  drift quarantines it, to confirm the constraint that forced the account-level approach.
+- **Pass**: account-level SCP tiers survive a full S0→S2→recycle cycle without quarantine,
+  bind every principal, and detach on recycle.
+- **Fallback if both fail**: pipeline-only detective enforcement (today's degraded
+  posture, ADR-0015); supersede ADR-0025's "primary enforcement" claim accordingly.
+
 ## Results
 
 | Spike | Date | Verdict | Notes / ADR action |
@@ -50,3 +66,4 @@ and linked from the governing ADR (per [`REFINEMENT.md`](REFINEMENT.md) step 5).
 | S0-1 | — | pending | |
 | S0-2 | — | pending | |
 | S0-3 | — | pending | |
+| S0-4 | — | pending | OU ratchet vs ISB drift (ADR-0025) |
