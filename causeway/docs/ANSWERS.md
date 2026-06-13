@@ -66,3 +66,9 @@ multiple-choice rounds with delegation allowed ("you decide → recommendation l
 |---|---|---|---|
 | 17 | "Why not wrap or fork ISB?" | We already wrap (`causeway-control` is the facade). **Fork only behind three sequential gates**: S0-1 finds no hold AND upstream contribution rejected AND fallback race window unacceptable | D20, ADR-0016 |
 | 18 | "Why not the agentcore CLI shifted further left?" | **Preview left, mint centrally**: `causeway verify` runs the gate's exact checks locally (advisory); evidence is only admissible from platform runners/keys; agentcore-cli consumed, never forked/wrapped | D21, ADR-0016 |
+
+## Round 8 — runbook operability (2026-06-13)
+
+| Q | Question | Answer | → |
+|---|---|---|---|
+| 19 | "Are the runbooks Kiro-operatable?" | Readable yes, executable no — fixed: every step tagged **[agent-ok] / [human-ack] / [ccoe]**, API verbs explicit, verifications and bounds stated, dry-run rehearsal until deployment | D22, ADR-0017 |
