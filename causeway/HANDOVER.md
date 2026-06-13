@@ -17,7 +17,9 @@ it is the thin extension that consumes ISB via its API and events.
 3. [`docs/SPEC.md`](docs/SPEC.md) — normative spec. §0 decision log is load-bearing; §4.5 is the ISB coherence map.
 4. [`docs/adr/README.md`](docs/adr/README.md) — the 29 decisions and why.
 5. [`docs/REFINEMENT.md`](docs/REFINEMENT.md) — how the spec evolves (the loop).
-6. [`docs/SPIKES.md`](docs/SPIKES.md) — confirmations/calibrations (they do **not** block the build).
+6. [`docs/DEFINITION-OF-DONE.md`](docs/DEFINITION-OF-DONE.md) — acceptance per epic ("what must be true to finish").
+7. [`docs/SKILLS.md`](docs/SKILLS.md) — skill contracts + required tests · [`docs/TESTING.md`](docs/TESTING.md) — test strategy.
+8. [`docs/SPIKES.md`](docs/SPIKES.md) — confirmations/calibrations (they do **not** block the build).
 
 ## How work happens here — two modes
 
@@ -62,6 +64,20 @@ Never push to another branch without explicit permission. Do **not** open a PR u
 Run [`scripts/check.sh`](scripts/check.sh) — it verifies ADR count vs index, every ADR is
 indexed, version-string consistency across SPEC/README/AGENTS, and decision-log contiguity.
 It must exit 0. (It does not replace the human traceability review in REFINEMENT.md.)
+
+## Is it ready? (ready = another agent can continue)
+This repo is **ready to hand over and continue** — refine or build. It is **not** "done"
+(no code yet, by design). The continuation bar is met:
+
+- [x] **State captured** — version, 29 ADRs (tiered), decision log D1–D34, coherence map §4.5.
+- [x] **Next actions defined** — build order (E1 first, §11) and open questions O1–O4 with defaults.
+- [x] **Rules documented** — `AGENTS.md` (immutability, traceability, no-invent, design-on-known-behaviour).
+- [x] **"Done" defined** — `docs/DEFINITION-OF-DONE.md` gives acceptance criteria per epic; `docs/TESTING.md` the test layers; `docs/SKILLS.md` the skill contracts+tests.
+- [x] **Self-check** — `scripts/check.sh` is green (counts, links, versions, decision contiguity, epics-have-DoD).
+- [x] **Honesty** — ADRs tiered (not all equal); cost-cap limits, ISB boundary, and unknowns stated plainly.
+
+What a continuing agent still must do: implement (nothing is built), run the spikes as
+parallel confirmations, and resolve O1–O4 when a stakeholder is available.
 
 ## Suggested first tasks for Codex
 1. Run `scripts/check.sh`; skim `AGENTS.md` + `docs/SPEC.md` §0–§4.5 to load the model.

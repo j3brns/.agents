@@ -18,13 +18,15 @@ spike implementations when tasked.
 
 - `HANDOVER.md` — **start here**: current state, build order, first tasks, self-check.
 - `scripts/check.sh` — repo consistency check (ADR count/index/versions/decisions). Run before committing.
-- `docs/SPEC.md` — normative spec (current: v0.12). §0 decision log D1–D34 is load-bearing.
+- `docs/SPEC.md` — normative spec (current: v0.13). §0 decision log D1–D34 is load-bearing.
 - `docs/adr/` — 29 immutable ADRs. **Never edit an accepted ADR**; supersede with a new one.
 - `docs/ANSWERS.md` — interview record; append-only.
 - `docs/REFINEMENT.md` — the refinement loop. **If asked to "refine", "iterate", or
   "take this through a loop", follow that document exactly** (FRAME → INTERVIEW →
   RECORD → DELTA → EVIDENCE → GATE).
-- `docs/SPIKES.md` — Spike 0; append results, never rewrite claims.
+- `docs/DEFINITION-OF-DONE.md` — acceptance criteria per epic (the "finished" gate).
+- `docs/SKILLS.md` — skill contracts + required tests · `docs/TESTING.md` — test strategy.
+- `docs/SPIKES.md` — confirmations/calibrations; append results, never rewrite claims.
 - `docs/ARCHITECTURE.md`, `runbooks/` — regenerate when the spec changes (a spec delta
   whose downstream artifacts don't move is incomplete).
 - `.kiro/specs/<unit>/` — requirements.md (EARS), design.md, tasks.md per buildable unit.

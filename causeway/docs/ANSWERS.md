@@ -154,3 +154,16 @@ multiple-choice rounds with delegation allowed ("you decide → recommendation l
 | Q | Question | Answer | → |
 |---|---|---|---|
 | 39 | "Prep the repo for handover to Codex" | Added [`HANDOVER.md`](../HANDOVER.md) (state, build order, first tasks, open questions); made [`AGENTS.md`](../AGENTS.md) Codex-native canonical entry (Codex reads it natively) + design-on-known-behaviour rule; added runnable [`scripts/check.sh`](../scripts/check.sh) consistency check (passes); marked the harvest-hold `.kiro` package superseded by ADR-0029 | (tooling/handover) |
+
+## Round 18 — readiness, skills, tests, DoD (2026-06-13)
+
+| Q | Question | Answer | → |
+|---|---|---|---|
+| 40 | "What about skills — is this repo really ready, are there tests or things that must be true to finish spec items?" | Honest: ready to **hand over and continue**, not "done". Closed the real gap: added **[DEFINITION-OF-DONE](../docs/DEFINITION-OF-DONE.md)** (acceptance per epic), **[SKILLS](../docs/SKILLS.md)** (3 skills: adjudicator specced, scaffolder + catalog-inductor to-spec; each with contract + required tests), **[TESTING](../docs/TESTING.md)** (9 test layers, deterministic vs statistical called out). `scripts/check.sh` now also enforces every epic has a DoD row | (readiness) |
+| 41 | "Ready means able to handover to another agent to continue" | Agreed — that bar is met: state captured, next actions + build order, rules, **DoD per item**, green self-check, honest tiering. Added a continuation checklist to [HANDOVER](../HANDOVER.md). Not built yet (by design) | (readiness) |
+
+## Round 19 — are all 29 ADRs worthy? (2026-06-13)
+
+| Q | Question | Answer | → |
+|---|---|---|---|
+| 42 | "Are all 29 ADRs worthy of that status?" | No — and the index now says so. Tiered: **~10 Foundational** (reverse = redesign), **~12 Core** (significant, real trade-off), **5 Tactical** (0012/0013/0017/0018/0019 — defensible but modest operational/UX choices, logged for traceability not depth), **1 Process** (0028). Two partially superseded (0008 mechanism→0029; 0026 framing→0027), kept for history | (honesty; ADR index) |

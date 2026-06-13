@@ -34,5 +34,13 @@ if nums:
     if missing: print("FAIL: decision-log gaps:", missing); sys.exit(0)
 PY
 
+
+# 5. every epic in SPEC has a Definition-of-Done row
+if [ -f docs/DEFINITION-OF-DONE.md ]; then
+  for e in $(grep -oE '\bE[0-9]+\b' docs/SPEC.md | sort -u); do
+    grep -q "\b$e\b" docs/DEFINITION-OF-DONE.md || note "epic $e has no Definition-of-Done row"
+  done
+else note "docs/DEFINITION-OF-DONE.md missing"; fi
+
 [ $fail -eq 0 ] && echo "OK: $adr_files ADRs, spec $spec_ver, index+versions+decisions consistent"
 exit $fail

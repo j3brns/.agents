@@ -1,5 +1,9 @@
 # The Graduated Innovation Stage ("Causeway")
 
+**Spec v0.13 — 2026-06-13 — status: readiness for agent handover — added Definition-of-Done
+(acceptance per epic), Skills inventory, Testing strategy, and honest ADR significance tiers.
+No new decisions (completion/honesty, not new architecture). Prior headers retained.**
+
 **Spec v0.12 — 2026-06-13 — status: design-on-known-behaviour discipline — spikes reclassified
 as confirm/calibrate not design-blockers (D33, ADR-0028); harvest redesigned continuous, removing
 the cleanup-hold dependency (D34, ADR-0029). Prior headers retained.**
@@ -894,7 +898,16 @@ target?"):
     final flush at the validated `durationThresholds` event — removes the unverified
     cleanup-hold dependency (old S0-1 demoted to a non-blocking confirmation).
 
-**Remaining for v0.13:**
+**Resolved in v0.13** (2026-06-13, "is it really ready / tests / are all ADRs worthy"):
+
+26. Readiness defined as **handover-able to continue**, and the gap closed: added
+    [DEFINITION-OF-DONE](DEFINITION-OF-DONE.md) (acceptance per epic), [SKILLS](SKILLS.md)
+    (skill contracts + required tests), [TESTING](TESTING.md) (test strategy). No new
+    decisions — these make existing decisions testable.
+27. Honesty: **not all ADRs are equally worthy** — the ADR index now tiers each
+    Foundational/Core/Tactical/Process and flags the two partial supersessions.
+
+**Remaining for v0.14:**
 
 1. Who arbitrates the catalog contribution path (E9) — platform team only, or trusted BU
    maintainers with platform review? (Default until decided: platform team only.)
